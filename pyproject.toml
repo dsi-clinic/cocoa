@@ -1,0 +1,38 @@
+[build-system]
+requires = [
+    "setuptools>=61",
+    "setuptools-scm>=8.0"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dsi-cocoa"
+dynamic = ["version"]
+authors = [
+    {name = "Nick Ross", email = ""},
+    {name = "Trevor Spreadbury", email = "tspread@uchicago.edu"}
+]
+maintainers = [
+    {name = "Nick Ross, Trevor Spreadbury"},
+]
+description = "Clinic Opinionated Codebase Oversight and Analysis"
+keywords = ["codebase analysis", "uchicago dsi"]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "GitPython",
+    "pyflakes",
+    "pylint",
+    "nbconvert",
+    "ipython",
+    "termcolor",
+    "black", 
+]
+
+[project.scripts]
+cocoa = "cocoa.evaluate_repo:main"
+
+[tool.setuptools_scm]
