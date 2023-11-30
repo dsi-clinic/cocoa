@@ -1,18 +1,32 @@
-### Automated Testing
+# Clinic Opinionated Codebase Oversight and Analysis
 
-This directory contains a tool `evaluate_repo` which runs code testing libraries against a repository. 
+This repository was developed in order to generate automated reports on how well codebases adhere to the [coding standards](https://github.com/dsi-clinic/coding-standards) of the University of Chicago's DSI [Clinic course](https://datascience.uchicago.edu/education/data-science-clinic/).
+
+The goals of this codebase is to provide a quick and easy way to review code and to alert contributors where their code may be failing.
+
+## Installation
+
+```pip install cocoa```
+
+
+
+### cocoa
+
+This package contains a module `evaluate_repo` which runs code testing libraries against a repository. 
 
 ### How to run
 
-In the root directory run the following commands:
+Via command line: 
+```bash
+cocoa /path/to/repo
+```
 
-```./build_image.sh```
+As a python module: 
+```python
+from cocoa.evaluate_repo import main
 
-which will install the image in docker. Make sure that no errors occur.
-
-To run the code on a repository located in `/path-to-repo` execute the following command:
-
-```./run-code-analysis.sh /path-to-repo```
+main(["path/to/repo"])
+```
 
 A few important notes:
 
@@ -22,4 +36,4 @@ A few important notes:
 
 If you want to do a full linting, then you can add the argument "LINT" to the `run-code-analysis` command, such as:
 
-```./run-code-analysis.sh /path-to-repo LINT```
+```cocoa /path-to-repo LINT```
