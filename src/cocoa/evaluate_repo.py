@@ -1,15 +1,14 @@
 import os
 import sys
-from cocoa.utils import is_git_repo
-from cocoa.utils import get_remote_branches_info
-from cocoa.utils import walk_and_process
+
+from cocoa.utils import get_remote_branches_info, is_git_repo, walk_and_process
 
 
 def main(argv=None) -> int:
-    '''
+    """
     This is the entry point to running the automated code review
     It should be called from inside the docker container
-    '''
+    """
     if argv is None:
         argv = sys.argv[1:]
 

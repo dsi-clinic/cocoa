@@ -2,20 +2,21 @@
 Utility Functions for running automated code and repo reviews.
 """
 
-import os
-import json
 import argparse
+import difflib
+import json
+import os
 import tempfile
 from io import StringIO
-from nbconvert import PythonExporter
-from termcolor import cprint
+
+import black
 import git
-from pyflakes.reporter import Reporter
+from nbconvert import PythonExporter
 from pyflakes.api import checkPath
+from pyflakes.reporter import Reporter
 from pylint.lint import Run
 from pylint.reporters.text import TextReporter
-import black
-import difflib
+from termcolor import cprint
 
 
 def get_current_branch(repo_path):
@@ -68,9 +69,9 @@ def process_notebook(file_path):
         max_lines_in_cell = 0
         for cell in cells:
             if cell["cell_type"] == "code":
-
-                lines_in_cell = len([1 for line in cell["source"]
-                                     if line.strip()])
+                lines_in_cell = len(
+                    [1 for line in cell["source"] if line.strip()]
+                )
                 num_lines += lines_in_cell
                 max_lines_in_cell = max(max_lines_in_cell, lines_in_cell)
                 num_functions += count_functions(cell)
@@ -83,11 +84,13 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
     """
 
     paths_to_flag = ["__pycache__", "DS_Store", "ipynb_checkpoints"]
-    cprint(f"Currently analyzing branch {get_current_branch( dir_path)}",
-           color="green")
+    cprint(
+        f"Currently analyzing branch {get_current_branch( dir_path)}",
+        color="green",
+    )
     pylint_warnings = []
 
-    for root, dirs, files in os.walk(dir_path):
+    for root, _, files in os.walk(dir_path):
         for file in files:
             file_path = os.path.join(root, file)
 
@@ -102,8 +105,9 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
                 ) = process_notebook(file_path)
 
                 if no_filter_flag or (
-                    num_cells > 10 or max_lines_in_cell > 15
-                        or num_functions > 0
+                    num_cells > 10
+                    or max_lines_in_cell > 15
+                    or num_functions > 0
                 ):
                     print(f"File: {file_path}")
                     print(f"\tNumber of cells: {num_cells}")
@@ -124,15 +128,19 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
                             print(f"{warning}")
 
                 if black_results:
-                    print(f"There were {len(black_results)} changes "
-                          f"on file {file_path}. Please run black.")
+                    print(
+                        f"There were {len(black_results)} changes "
+                        f"on file {file_path}. Please run black."
+                    )
 
             if len(pyflake_results) > 0:
                 print(*pyflake_results, sep="\n")
 
             if len([x for x in paths_to_flag if x in file]) > 0:
-                print(f"Warning: the file {file_path} should be \
-                      filtered via gitignore.")
+                print(
+                    f"Warning: the file {file_path} should be \
+                      filtered via gitignore."
+                )
 
     return None
 
@@ -147,8 +155,9 @@ def pyflakes_notebook(path_to_notebook):
     exporter = PythonExporter()
     script, _ = exporter.from_filename(path_to_notebook)
 
-    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".py") \
-            as temp:
+    with tempfile.NamedTemporaryFile(
+        mode="w", delete=False, suffix=".py"
+    ) as temp:
         temp_name = temp.name
         temp.write(script)
 

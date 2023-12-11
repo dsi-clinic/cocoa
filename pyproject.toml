@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 name = "dsi-cocoa"
 dynamic = ["version"]
 authors = [
-    {name = "Nick Ross", email = ""},
+    {name = "Nick Ross", email = "tspread@uchicago.edu"},
     {name = "Trevor Spreadbury", email = "tspread@uchicago.edu"}
 ]
 maintainers = [
