@@ -1,3 +1,6 @@
+"""
+Main entry point for complete evaluation of a python codebase in git
+"""
 import os
 import sys
 

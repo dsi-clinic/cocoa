@@ -1,5 +1,5 @@
 """"
-Utility Functions for running automated code and repo reviews.
+Utility Functions for evaluating the status and structure of python code
 """
 
 import argparse

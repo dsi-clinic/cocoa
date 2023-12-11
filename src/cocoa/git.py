@@ -1,3 +1,6 @@
+"""
+Utilities for evaluating the status and structure of a git repository
+"""
 import git
 
 
