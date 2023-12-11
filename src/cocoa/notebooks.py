@@ -3,6 +3,11 @@ import os
 
 from termcolor import cprint
 
+from cocoa.constants import (
+    MAX_CELLS_PER_NOTEBOOK,
+    MAX_FUNCTIONS_PER_NOTEBOOK,
+    MAX_LINES_PER_CELL,
+)
 from cocoa.git import get_current_branch
 from cocoa.linting import (
     black_python_file,
@@ -67,9 +72,9 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
                 ) = process_notebook(file_path)
 
                 if no_filter_flag or (
-                    num_cells > 10
-                    or max_lines_in_cell > 15
-                    or num_functions > 0
+                    num_cells > MAX_CELLS_PER_NOTEBOOK
+                    or max_lines_in_cell > MAX_LINES_PER_CELL
+                    or num_functions > MAX_FUNCTIONS_PER_NOTEBOOK
                 ):
                     print(f"File: {file_path}")
                     print(f"\tNumber of cells: {num_cells}")
