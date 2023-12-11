@@ -43,7 +43,7 @@ jobs:
     permissions:
       id-token: write
     
-    stps:
+    steps:
       - name: Download all the dists
         uses: actions/download-artifact@v3
         with:
