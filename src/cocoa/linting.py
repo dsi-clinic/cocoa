@@ -16,6 +16,28 @@ from pylint.lint import Run
 from pylint.reporters.text import TextReporter
 
 
+def convert_temp_names_to_originals(
+    errors_and_warnings: list, original_path: str
+):
+    """In a list of errors ["<path>: <error>"], converts path to original_path
+
+    When Jupyter Notebooks are converted to python temp files and run throughj
+    pyflakes, the reported errors are for the temp files. This function converts
+    them back to be more descriptive
+
+    Args:
+        errors_and_warnings: list of pyflakes errors and warnings of the format
+            ["<path>: <error/warning>"]
+        original_path: name of original jupyter notebook
+    Returns: list with format ["<original_path>: <error/warning>"]
+    """
+    # assuming format of <path> is <path>:<line no>:<column no>:, we want first colon
+    return [
+        original_path + path_and_message[path_and_message.find(":") :]
+        for path_and_message in errors_and_warnings
+    ]
+
+
 def pyflakes_notebook(path_to_notebook):
     """
     Run pyflakes on a Jupyter notebook.
@@ -33,10 +55,14 @@ def pyflakes_notebook(path_to_notebook):
         temp.write(script)
 
     errors_and_warnings = pyflakes_python_file(temp_name)
+    reformatted_errors_and_warnings = convert_temp_names_to_originals(
+        errors_and_warnings,
+        path_to_notebook,
+    )
 
     # Delete temporary file
     os.remove(temp_name)
-    return errors_and_warnings
+    return reformatted_errors_and_warnings
 
 
 def pyflakes_python_file(file_path):
