@@ -4,8 +4,9 @@ name: Publish Python Distribution to PyPI
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+# publish when a new tag is pushed with semantic version
 
 jobs:
   build:
