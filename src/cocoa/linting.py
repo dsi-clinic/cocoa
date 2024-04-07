@@ -8,6 +8,7 @@ import os
 import tempfile
 from io import StringIO
 
+import ast
 import black
 from nbconvert import PythonExporter
 from pyflakes.api import checkPath
@@ -33,7 +34,7 @@ def convert_temp_names_to_originals(
     """
     # assuming format of <path> is <path>:<line no>:<column no>:, we want first colon
     return [
-        original_path + path_and_message[path_and_message.find(":") :]
+        original_path + path_and_message[path_and_message.find(":"):]
         for path_and_message in errors_and_warnings
     ]
 
@@ -149,3 +150,42 @@ def black_python_file(file_path):
         return None
     except Exception as e:
         return f"Unexpected error: {e}"
+
+
+def is_code_in_functions_or_main(file_path):
+    """
+    Check if all code in the given Python script is within functions or the main block.
+
+    Args:
+        file_path (str): The path to the Python script.
+
+    Returns:
+        bool: True if all code is within functions or main block, False otherwise.
+    """
+
+    with open(file_path, "r", encoding="utf-8") as file:
+        tree = ast.parse(file.read(), filename=file_path)
+
+    # Assume code is properly encapsulated until found otherwise
+    properly_encapsulated = True
+
+    # Check each statement in the module
+    for node in tree.body:
+        # Ignore import statements
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            continue
+
+        # Check for function or class definitions and main block
+        if not (isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) or
+                (isinstance(node, ast.If) and
+                 isinstance(node.test, ast.Compare) and
+                 isinstance(node.test.ops[0], ast.Eq) and
+                 isinstance(node.test.left, ast.Name) and
+                 node.test.left.id == "__name__" and
+                 isinstance(node.test.comparators[0], ast.Constant) and
+                 node.test.comparators[0].value == "__main__")):
+            # Found code that is not in a function/class definition or the main block
+            properly_encapsulated = False
+            break
+
+    return properly_encapsulated

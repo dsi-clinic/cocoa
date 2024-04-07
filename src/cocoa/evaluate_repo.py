@@ -17,6 +17,7 @@ from cocoa.linting import (
     get_pylint_warnings,
     pyflakes_notebook,
     pyflakes_python_file,
+    is_code_in_functions_or_main,
 )
 from cocoa.notebooks import process_notebook
 
@@ -74,6 +75,11 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
                         f"There were {len(black_results)} changes "
                         f"on file {file_path}. Please run black."
                     )
+
+                # check is_code_in_functions_or_main
+                if not is_code_in_functions_or_main(file_path):
+                    print(
+                        f"Code outside functions or main block detected in {file_path}")
 
             if len(pyflake_results) > 0:
                 print(*pyflake_results, sep="\n")
