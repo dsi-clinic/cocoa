@@ -21,11 +21,9 @@ Via command line:
 cocoa /path/to/repo
 ```
 
-As a python module: 
-```python
-from cocoa.evaluate_repo import main
-
-main(["path/to/repo"])
+As a python file: 
+```bash
+python3 /src/cocoa/evaluate_repo.py /path/to/repo
 ```
 
 A few important notes:
