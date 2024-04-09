@@ -24,7 +24,9 @@ def process_notebook(file_path):
         max_lines_in_cell = 0
         for cell in cells:
             if cell["cell_type"] == "code":
-                lines_in_cell = len([1 for line in cell["source"] if line.strip()])
+                lines_in_cell = len(
+                    [1 for line in cell["source"] if line.strip()]
+                )
                 num_lines += lines_in_cell
                 max_lines_in_cell = max(max_lines_in_cell, lines_in_cell)
                 num_functions += count_functions(cell)

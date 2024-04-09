@@ -1,8 +1,8 @@
 """
 Main entry point for complete evaluation of a python codebase in git
 """
-import os
 import argparse
+import os
 
 from termcolor import cprint
 
@@ -11,7 +11,6 @@ from cocoa.constants import (
     MAX_FUNCTIONS_PER_NOTEBOOK,
     MAX_LINES_PER_CELL,
 )
-from cocoa.github import get_current_branch, get_remote_branches_info, is_git_repo
 from cocoa.linting import (
     black_python_file,
     get_pylint_warnings,
@@ -19,6 +18,7 @@ from cocoa.linting import (
     pyflakes_python_file,
 )
 from cocoa.notebooks import process_notebook
+from cocoa.repo import get_current_branch, get_remote_branches_info, is_git_repo
 
 
 def walk_and_process(dir_path, no_filter_flag, lint_flag):

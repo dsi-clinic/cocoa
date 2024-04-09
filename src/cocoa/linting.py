@@ -15,7 +15,9 @@ from pylint.lint import Run
 from pylint.reporters.text import TextReporter
 
 
-def convert_temp_names_to_originals(errors_and_warnings: list, original_path: str):
+def convert_temp_names_to_originals(
+    errors_and_warnings: list, original_path: str
+):
     """In a list of errors ["<path>: <error>"], converts path to original_path
 
     When Jupyter Notebooks are converted to python temp files and run throughj
@@ -45,7 +47,9 @@ def pyflakes_notebook(path_to_notebook):
     exporter = PythonExporter()
     script, _ = exporter.from_filename(path_to_notebook)
 
-    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".py") as temp:
+    with tempfile.NamedTemporaryFile(
+        mode="w", delete=False, suffix=".py"
+    ) as temp:
         temp_name = temp.name
         temp.write(script)
 
