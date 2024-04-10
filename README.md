@@ -9,7 +9,9 @@ The goals of this codebase is to provide a quick and easy way to review code and
 ```pip install cocoa```
 
 To install the package from the local files, run the following command from the root of the repository:
-```python3 -m pip install .```
+```bash
+python3 -m pip install .
+```
 
 ### cocoa
 
@@ -29,7 +31,14 @@ cocoa /path/to/repo
 
 As a python script: 
 ```bash
-python3 /src/cocoa/evaluate_repo.py /path/to/repo
+python3 src/cocoa/evaluate_repo.py /path/to/repo
+```
+
+As a Python module:
+```python
+from cocoa.evaluate_repo import evaluate_repo
+
+evaluate_repo('/path/to/repo', False)
 ```
 
 A few important notes:
