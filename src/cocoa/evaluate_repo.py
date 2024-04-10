@@ -20,6 +20,8 @@ from cocoa.linting import (
 )
 from cocoa.notebooks import process_notebook
 
+from cocoa.repo_checks import check_branch_names
+
 
 def walk_and_process(dir_path, no_filter_flag, lint_flag):
     """
@@ -104,6 +106,12 @@ def main(argv=None) -> int:
     if not is_git_repo(dir_path):
         print(f"Error: {dir_path} is not a Git repository.")
         exit(1)
+
+    # check branch
+    print("check branch")
+    branch_warnings = check_branch_names(dir_path)
+    for warning in branch_warnings:
+        print(warning)
 
     if os.getenv("LINT") is not None and len(os.getenv("LINT")) > 0:
         lint_flag = True
