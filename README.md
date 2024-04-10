@@ -8,7 +8,8 @@ The goals of this codebase is to provide a quick and easy way to review code and
 
 ```pip install cocoa```
 
-
+To install the package from the local files, run the following command from the root of the repository:
+```python3 -m pip install .```
 
 ### cocoa
 
@@ -21,11 +22,9 @@ Via command line:
 cocoa /path/to/repo
 ```
 
-As a python module: 
-```python
-from cocoa.evaluate_repo import main
-
-main(["path/to/repo"])
+As a python script: 
+```bash
+python3 /src/cocoa/evaluate_repo.py /path/to/repo
 ```
 
 A few important notes:
@@ -34,6 +33,8 @@ A few important notes:
 1. This will get branch information for all branches.
 1. This will only run the analysis (`pyflakes` on python files) for the code _in the current branch_. So if you run this while your current branch is `main` it will run on `main`.
 
-If you want to do a full linting, then you can add the argument "LINT" to the `run-code-analysis` command, such as:
+If you want to do a full linting, then you can add the argument "--lint" to the command, such as:
 
-```cocoa /path-to-repo LINT```
+```bash
+cocoa /path/to/repo --lint
+```

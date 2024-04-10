@@ -1,8 +1,8 @@
 """
 Main entry point for complete evaluation of a python codebase in git
 """
+import argparse
 import os
-import sys
 
 from termcolor import cprint
 
@@ -11,7 +11,6 @@ from cocoa.constants import (
     MAX_FUNCTIONS_PER_NOTEBOOK,
     MAX_LINES_PER_CELL,
 )
-from cocoa.git import get_current_branch, get_remote_branches_info, is_git_repo
 from cocoa.linting import (
     black_python_file,
     get_pylint_warnings,
@@ -20,6 +19,7 @@ from cocoa.linting import (
     is_code_in_functions_or_main,
 )
 from cocoa.notebooks import process_notebook
+from cocoa.repo import get_current_branch, get_remote_branches_info, is_git_repo
 
 from cocoa.repo_checks import check_branch_names
 
@@ -95,15 +95,20 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
     return None
 
 
-def main(argv=None) -> int:
+def main():
     """
     This is the entry point to running the automated code review
     It should be called from inside the docker container
     """
-    if argv is None:
-        argv = sys.argv[1:]
+    parser = argparse.ArgumentParser(description="COCOA CLI")
 
-    dir_path = argv[0]
+    parser.add_argument("repo", help="Path to a repository root directory")
+    parser.add_argument("--lint", help="Lint option", action="store_true")
+
+    args = parser.parse_args()
+
+    dir_path = args.repo
+    lint_flag = args.lint
 
     if not os.path.isdir(dir_path):
         print(f"Error: {dir_path} is not a valid directory.")
@@ -114,16 +119,15 @@ def main(argv=None) -> int:
         exit(1)
 
     # check branch
-    print("check branch")
+    print("Check branch names")
     branch_warnings = check_branch_names(dir_path)
     for warning in branch_warnings:
         print(warning)
 
-    if os.getenv("LINT") is not None and len(os.getenv("LINT")) > 0:
-        lint_flag = True
-    else:
-        lint_flag = False
-
     get_remote_branches_info(dir_path)
     walk_and_process(dir_path, None, lint_flag=lint_flag)
     return 0
+
+
+if __name__ == "__main__":
+    main()
