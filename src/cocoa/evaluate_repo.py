@@ -120,7 +120,7 @@ def evaluate_repo(dir_path, lint_flag):
     return 0
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="COCOA CLI")
 
     parser.add_argument("repo", help="Path to a repository root directory")
@@ -132,3 +132,7 @@ if __name__ == "__main__":
     lint_flag = args.lint
 
     evaluate_repo(dir_path, lint_flag)
+
+
+if __name__ == "__main__":
+    main()
