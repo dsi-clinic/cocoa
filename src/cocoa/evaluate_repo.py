@@ -14,13 +14,12 @@ from cocoa.constants import (
 from cocoa.linting import (
     black_python_file,
     get_pylint_warnings,
+    is_code_in_functions_or_main,
     pyflakes_notebook,
     pyflakes_python_file,
-    is_code_in_functions_or_main,
 )
 from cocoa.notebooks import process_notebook
 from cocoa.repo import get_current_branch, get_remote_branches_info, is_git_repo
-
 from cocoa.repo_checks import check_branch_names
 
 
@@ -81,7 +80,8 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
                 # check is_code_in_functions_or_main
                 if not is_code_in_functions_or_main(file_path):
                     print(
-                        f"Code outside functions or main block detected in {file_path}")
+                        f"Code outside functions or main block detected in {file_path}"
+                    )
 
             if len(pyflake_results) > 0:
                 print(*pyflake_results, sep="\n")
@@ -95,20 +95,11 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
     return None
 
 
-def main():
+def evaluate_repo(dir_path, lint_flag):
     """
     This is the entry point to running the automated code review
-    It should be called from inside the docker container
+    It should be called from inside the docker container.
     """
-    parser = argparse.ArgumentParser(description="COCOA CLI")
-
-    parser.add_argument("repo", help="Path to a repository root directory")
-    parser.add_argument("--lint", help="Lint option", action="store_true")
-
-    args = parser.parse_args()
-
-    dir_path = args.repo
-    lint_flag = args.lint
 
     if not os.path.isdir(dir_path):
         print(f"Error: {dir_path} is not a valid directory.")
@@ -130,4 +121,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="COCOA CLI")
+
+    parser.add_argument("repo", help="Path to a repository root directory")
+    parser.add_argument("--lint", help="Lint option", action="store_true")
+
+    args = parser.parse_args()
+
+    dir_path = args.repo
+    lint_flag = args.lint
+
+    evaluate_repo(dir_path, lint_flag)
