@@ -16,9 +16,12 @@ from cocoa.linting import (
     get_pylint_warnings,
     pyflakes_notebook,
     pyflakes_python_file,
+    is_code_in_functions_or_main,
 )
 from cocoa.notebooks import process_notebook
 from cocoa.repo import get_current_branch, get_remote_branches_info, is_git_repo
+
+from cocoa.repo_checks import check_branch_names
 
 
 def walk_and_process(dir_path, no_filter_flag, lint_flag):
@@ -75,6 +78,11 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
                         f"on file {file_path}. Please run black."
                     )
 
+                # check is_code_in_functions_or_main
+                if not is_code_in_functions_or_main(file_path):
+                    print(
+                        f"Code outside functions or main block detected in {file_path}")
+
             if len(pyflake_results) > 0:
                 print(*pyflake_results, sep="\n")
 
@@ -109,6 +117,12 @@ def main():
     if not is_git_repo(dir_path):
         print(f"Error: {dir_path} is not a Git repository.")
         exit(1)
+
+    # check branch
+    print("Check branch names")
+    branch_warnings = check_branch_names(dir_path)
+    for warning in branch_warnings:
+        print(warning)
 
     get_remote_branches_info(dir_path)
     walk_and_process(dir_path, None, lint_flag=lint_flag)
