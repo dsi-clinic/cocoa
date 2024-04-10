@@ -13,7 +13,12 @@ To install the package from the local files, run the following command from the 
 
 ### cocoa
 
-This package contains a module `evaluate_repo` which runs code testing libraries against a repository. 
+This package contains a module `evaluate_repo` which runs code testing libraries against a repository. There are multiple ways that we want to be able to run this repo:
+
+1. We want to be able to clone `cocoa` and then use it as part of their process.
+2. We want adminstrators to be able to give it a list of repos to generate reports on all repos.
+3. (Eventually) We want it to be able to run as a github action _on the repo itself_.
+4. (Eventually) We want to be able to have administrive repo that can run it on other repos.
 
 ### How to run
 
