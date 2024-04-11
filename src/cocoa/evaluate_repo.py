@@ -19,8 +19,12 @@ from cocoa.linting import (
     pyflakes_python_file,
 )
 from cocoa.notebooks import process_notebook
-from cocoa.repo import get_current_branch, get_remote_branches_info, is_git_repo
-from cocoa.repo_checks import check_branch_names
+from cocoa.repo import (
+    check_branch_names,
+    get_current_branch,
+    get_remote_branches_info,
+    is_git_repo,
+)
 
 
 def walk_and_process(dir_path, no_filter_flag, lint_flag):
@@ -109,12 +113,7 @@ def evaluate_repo(dir_path, lint_flag):
         print(f"Error: {dir_path} is not a Git repository.")
         exit(1)
 
-    # check branch
-    print("Check branch names")
-    branch_warnings = check_branch_names(dir_path)
-    for warning in branch_warnings:
-        print(warning)
-
+    check_branch_names(dir_path)
     get_remote_branches_info(dir_path)
     walk_and_process(dir_path, None, lint_flag=lint_flag)
     return 0
