@@ -1,6 +1,7 @@
 """
 Main entry point for complete evaluation of a python codebase in git
 """
+
 import argparse
 import os
 
@@ -13,18 +14,19 @@ from cocoa.constants import (
 )
 from cocoa.linting import (
     black_python_file,
+    functions_without_docstrings,
     get_pylint_warnings,
     is_code_in_functions_or_main,
     pyflakes_notebook,
     pyflakes_python_file,
-    functions_without_docstrings
 )
 from cocoa.notebooks import process_notebook
 from cocoa.repo import (
     check_branch_names,
+    files_after_date,
     get_current_branch,
     get_remote_branches_info,
-    is_git_repo, files_after_date
+    is_git_repo,
 )
 
 
@@ -42,7 +44,11 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
     if start_date:
         files_to_process = files_after_date(dir_path, start_date)
     else:
-        files_to_process = [os.path.join(root, f) for root, _, files in os.walk(dir_path) for f in files]
+        files_to_process = [
+            os.path.join(root, f)
+            for root, _, files in os.walk(dir_path)
+            for f in files
+        ]
 
     pylint_warnings = []
 
@@ -94,13 +100,16 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
                     print(
                         f"Code outside functions or main block detected in {file_path}"
                     )
-                
+
                 # check if functions have docstrings
-                functions_no_docstrings = functions_without_docstrings(file_path)
+                functions_no_docstrings = functions_without_docstrings(
+                    file_path
+                )
 
                 if functions_no_docstrings:
                     print(
-                        f"Following functions without docstrings detected in {file_path}:"
+                        f"Following functions without docstrings"
+                        f" detected in {file_path}:"
                         f"{functions_no_docstrings}"
                     )
 
@@ -141,7 +150,12 @@ def main():
 
     parser.add_argument("repo", help="Path to a repository root directory")
     parser.add_argument("--lint", help="Lint option", action="store_true")
-    parser.add_argument("--date", default=None, help="Start date in YYYY-MM-DD format to filter files by commit date", type=str)
+    parser.add_argument(
+        "--date",
+        default=None,
+        help="Start date in YYYY-MM-DD format to filter files by commit date",
+        type=str,
+    )
 
     args = parser.parse_args()
 
