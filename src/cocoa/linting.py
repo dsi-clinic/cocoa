@@ -117,7 +117,7 @@ def black_python_file(file_path):
         formatted_content = black.format_file_contents(
             content,
             fast=False,
-            mode=black.FileMode(),
+            mode=black.FileMode(line_length=80),
         )
 
         # Compare original and formatted content
