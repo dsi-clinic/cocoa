@@ -1,9 +1,11 @@
 """
 Utilities for evaluating the status and structure of a git repository
 """
-import git
-from datetime import datetime
+
 import os
+from datetime import datetime
+
+import git
 
 
 def is_git_repo(repo_path):
@@ -101,9 +103,9 @@ def check_branch_names(repo_path):
 
 def files_after_date(repo_path, start_date):
     """
-    Returns a list of files that have been committed after 
+    Returns a list of files that have been committed after
     a specified start date.
-    
+
     Args:
         repo_path (str): Path to the Git repository.
         start_date (str): Start date in 'YYYY-MM-DD' format.
