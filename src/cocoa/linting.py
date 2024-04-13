@@ -151,35 +151,41 @@ def is_code_in_functions_or_main(file_path):
         bool: True if all code is within functions or main block, False otherwise.
     """
 
-    with open(file_path, "r", encoding="utf-8") as file:
-        tree = ast.parse(file.read(), filename=file_path)
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            tree = ast.parse(file.read(), filename=file_path)
 
-    # Assume code is properly encapsulated until found otherwise
-    properly_encapsulated = True
+        # Assume code is properly encapsulated until found otherwise
+        properly_encapsulated = True
 
-    # Check each statement in the module
-    for node in tree.body:
-        # Ignore import statements
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
-            continue
+        # Check each statement in the module
+        for node in tree.body:
+            # Ignore import statements
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                continue
 
-        # Check for function or class definitions and main block
-        if not (
-            isinstance(
-                node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
-            )
-            or (
-                isinstance(node, ast.If)
-                and isinstance(node.test, ast.Compare)
-                and isinstance(node.test.ops[0], ast.Eq)
-                and isinstance(node.test.left, ast.Name)
-                and node.test.left.id == "__name__"
-                and isinstance(node.test.comparators[0], ast.Constant)
-                and node.test.comparators[0].value == "__main__"
-            )
-        ):
-            # Found code that is not in a function/class definition or the main block
-            properly_encapsulated = False
-            break
+            # Check for function or class definitions, main block, and module docstrings
+            if not (
+                isinstance(
+                    node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+                )
+                or (
+                    isinstance(node, ast.If)
+                    and isinstance(node.test, ast.Compare)
+                    and isinstance(node.test.ops[0], ast.Eq)
+                    and isinstance(node.test.left, ast.Name)
+                    and node.test.left.id == "__name__"
+                    and isinstance(node.test.comparators[0], ast.Constant)
+                    and node.test.comparators[0].value == "__main__"
+                )
+                or isinstance(node.value, ast.Constant)
+            ):
+                # Found code that is not in a function/class def or the main block
+                properly_encapsulated = False
+                break
 
-    return properly_encapsulated
+        return properly_encapsulated
+    except SyntaxError:
+        print(f"SyntaxError while parsing file {file_path}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
