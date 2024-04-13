@@ -189,3 +189,30 @@ def is_code_in_functions_or_main(file_path):
         print(f"SyntaxError while parsing file {file_path}")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+
+
+def functions_without_docstrings(file_path):
+    """
+    Identify all functions in a given Python file that do not have docstrings.
+
+    Args:
+        file_path (str): Path to the Python script.
+
+    Returns:
+        list: A list of names of functions that do not have docstrings.
+    """
+    with open(file_path, "r", encoding="utf-8") as source:
+        tree = ast.parse(source.read(), filename=file_path)
+
+    no_docstrings = []
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            # Check if first node in function body is a docstring
+            if not (
+                node.body
+                and isinstance(node.body[0], ast.Expr)
+                and isinstance(node.body[0].value, (ast.Str, ast.Constant))
+            ):
+                no_docstrings.append(node.name)
+    return no_docstrings

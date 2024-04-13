@@ -1,6 +1,10 @@
 """
 Utilities for evaluating the status and structure of a git repository
 """
+
+import os
+from datetime import datetime
+
 import git
 
 
@@ -95,3 +99,29 @@ def check_branch_names(repo_path):
     for warning in warnings:
         print(warning)
     return warnings
+
+
+def files_after_date(repo_path, start_date):
+    """
+    Returns a list of files that have been committed after
+    a specified start date.
+
+    Args:
+        repo_path (str): Path to the Git repository.
+        start_date (str): Start date in 'YYYY-MM-DD' format.
+
+    Returns:
+        List[str]: A list of file paths committed after the start date.
+    """
+    repo = git.Repo(repo_path)
+    since_date = datetime.strptime(start_date, "%Y-%m-%d")
+    files_modified = []
+
+    for commit in repo.iter_commits():
+        commit_date = datetime.fromtimestamp(commit.committed_date)
+        if commit_date > since_date:
+            for entry in commit.stats.files.keys():
+                file_path = os.path.join(repo.working_dir, entry)
+                if file_path not in files_modified:
+                    files_modified.append(file_path)
+    return files_modified

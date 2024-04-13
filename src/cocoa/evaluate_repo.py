@@ -1,6 +1,7 @@
 """
 Main entry point for complete evaluation of a python codebase in git
 """
+
 import argparse
 import os
 
@@ -13,6 +14,7 @@ from cocoa.constants import (
 )
 from cocoa.linting import (
     black_python_file,
+    functions_without_docstrings,
     get_pylint_warnings,
     is_code_in_functions_or_main,
     pyflakes_notebook,
@@ -21,13 +23,14 @@ from cocoa.linting import (
 from cocoa.notebooks import process_notebook
 from cocoa.repo import (
     check_branch_names,
+    files_after_date,
     get_current_branch,
     get_remote_branches_info,
     is_git_repo,
 )
 
 
-def walk_and_process(dir_path, no_filter_flag, lint_flag):
+def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
     """
     Walk through directory and process all python and jupyter notebook files.
     """
@@ -36,15 +39,26 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
         f"Currently analyzing branch {get_current_branch( dir_path)}",
         color="green",
     )
+
+    # check for files after a specific data
+    if start_date:
+        files_to_process = files_after_date(dir_path, start_date)
+    else:
+        files_to_process = [
+            os.path.join(root, f)
+            for root, _, files in os.walk(dir_path)
+            for f in files
+        ]
+
     pylint_warnings = []
 
-    for root, _, files in os.walk(dir_path):
-        for file in files:
-            file_path = os.path.join(root, file)
+    for file_path in files_to_process:
 
+        # Check if file path exists
+        if os.path.exists(file_path):
             pyflake_results = []
 
-            if file.endswith(".ipynb"):
+            if file_path.endswith(".ipynb"):
                 (
                     num_cells,
                     num_lines,
@@ -66,7 +80,7 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
 
                 pyflake_results = pyflakes_notebook(file_path)
 
-            elif file.endswith(".py"):
+            elif file_path.endswith(".py"):
                 pyflake_results = pyflakes_python_file(file_path)
                 black_results = black_python_file(file_path)
                 if lint_flag:
@@ -87,10 +101,22 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
                         f"Code outside functions or main block detected in {file_path}"
                     )
 
+                # check if functions have docstrings
+                functions_no_docstrings = functions_without_docstrings(
+                    file_path
+                )
+
+                if functions_no_docstrings:
+                    print(
+                        f"Following functions without docstrings"
+                        f" detected in {file_path}:"
+                        f"{functions_no_docstrings}"
+                    )
+
             if len(pyflake_results) > 0:
                 print(*pyflake_results, sep="\n")
 
-            if len([x for x in paths_to_flag if x in file]) > 0:
+            if len([x for x in paths_to_flag if x in file_path]) > 0:
                 print(
                     f"Warning: the file {file_path} should be \
                       filtered via gitignore."
@@ -99,7 +125,7 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag):
     return None
 
 
-def evaluate_repo(dir_path, lint_flag):
+def evaluate_repo(dir_path, lint_flag, start_date):
     """
     This is the entry point to running the automated code review
     It should be called from inside the docker container.
@@ -115,7 +141,7 @@ def evaluate_repo(dir_path, lint_flag):
 
     check_branch_names(dir_path)
     get_remote_branches_info(dir_path)
-    walk_and_process(dir_path, None, lint_flag=lint_flag)
+    walk_and_process(dir_path, None, lint_flag=lint_flag, start_date=start_date)
     return 0
 
 
@@ -124,13 +150,20 @@ def main():
 
     parser.add_argument("repo", help="Path to a repository root directory")
     parser.add_argument("--lint", help="Lint option", action="store_true")
+    parser.add_argument(
+        "--date",
+        default=None,
+        help="Start date in YYYY-MM-DD format to filter files by commit date",
+        type=str,
+    )
 
     args = parser.parse_args()
 
     dir_path = args.repo
     lint_flag = args.lint
+    start_date = args.date
 
-    evaluate_repo(dir_path, lint_flag)
+    evaluate_repo(dir_path, lint_flag, start_date)
 
 
 if __name__ == "__main__":
