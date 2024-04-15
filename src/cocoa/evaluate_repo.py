@@ -14,6 +14,7 @@ from cocoa.constants import (
 )
 from cocoa.linting import (
     black_python_file,
+    code_contains_subprocess,
     functions_without_docstrings,
     get_pylint_warnings,
     is_code_in_functions_or_main,
@@ -100,6 +101,10 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
                     print(
                         f"Code outside functions or main block detected in {file_path}"
                     )
+
+                # check if code uses subprocess
+                if code_contains_subprocess(file_path):
+                    print(f"Warning: subprocess usage detected in {file_path}")
 
                 # check if functions have docstrings
                 functions_no_docstrings = functions_without_docstrings(
