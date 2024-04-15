@@ -216,3 +216,44 @@ def functions_without_docstrings(file_path):
             ):
                 no_docstrings.append(node.name)
     return no_docstrings
+
+
+class SubprocessVisitor(ast.NodeVisitor):
+    def __init__(self):
+        self.found = False
+
+    def visit_Import(self, node):
+        for alias in node.names:
+            if alias.name == "subprocess":
+                self.found = True
+        self.generic_visit(node)
+
+    def visit_ImportFrom(self, node):
+        if node.module == "subprocess":
+            self.found = True
+        self.generic_visit(node)
+
+
+def code_contains_subprocess(filepath):
+    """
+    Check if code uses subprocess.
+
+    Args:
+        file_path (str): The path to the Python script.
+
+    Returns:
+        bool: True if code contains subprocess, False otherwise.
+    """
+    try:
+        with open(filepath, "r") as file:
+            # Read the content of the file
+            file_content = file.read()
+            # Parse the content into an AST
+            tree = ast.parse(file_content)
+            # Create an instance of the visitor and run it on the AST
+            visitor = SubprocessVisitor()
+            visitor.visit(tree)
+            return visitor.found
+    except IOError as e:
+        print(f"Error opening or reading the file: {e}")
+        return False
