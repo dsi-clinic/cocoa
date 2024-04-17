@@ -1,6 +1,10 @@
 """
 Utilities for evaluating the status and structure of a git repository
 """
+
+import os
+from datetime import datetime
+
 import git
 
 import os
@@ -15,7 +19,7 @@ def is_git_repo(repo_path):
     return git.Repo(repo_path).git_dir is not None
 
 
-def get_remote_branches_info(repo_path):
+def get_remote_branches_info(repo_path, display=True):
     """
     This function reutrns the branch information from the
     remote repository.
@@ -34,11 +38,12 @@ def get_remote_branches_info(repo_path):
         num_ahead, num_behind = commits_diff.split("\t")
         branch_info.append([branch.name, num_ahead, num_behind])
 
-    for branch, behind, ahead in branch_info:
-        print(f"Branch: {branch}")
-        print(f"Commits behind main: {behind}")
-        print(f"Commits ahead of main: {ahead}")
-        print()
+    if display:
+        for branch, behind, ahead in branch_info:
+            print(f"Branch: {branch}")
+            print(f"Commits behind main: {behind}")
+            print(f"Commits ahead of main: {ahead}")
+            print()
 
     return branch_info
 
@@ -115,3 +120,56 @@ def clone_repo(repo_url, dir_path="temp_repo_dir"):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         raise
+
+def check_branch_names(repo_path):
+    """
+    Check for branches other than 'main' and 'dev' in the repository.
+
+    Args:
+        repo_path (str): The path to the repository.
+
+    Returns:
+        list: A list of warnings regarding branch names.
+    """
+    branches_info = get_remote_branches_info(repo_path, False)
+    warnings = []
+
+    for branch_info in branches_info:
+        # Assuming branch_info is a list where the first item is the branch name
+        # Extracts branch name after 'origin/'
+        branch_name = branch_info[0].split("/")[-1]
+        if branch_name not in ["main", "dev"]:
+            warnings.append(
+                f"Warning: Found non-standard branch '{branch_name}' in repository."
+            )
+
+    for warning in warnings:
+        print(warning)
+    return warnings
+
+
+def files_after_date(repo_path, start_date):
+    """
+    Returns a list of files that have been committed after
+    a specified start date.
+
+    Args:
+        repo_path (str): Path to the Git repository.
+        start_date (str): Start date in 'YYYY-MM-DD' format.
+
+    Returns:
+        List[str]: A list of file paths committed after the start date.
+    """
+    repo = git.Repo(repo_path)
+    since_date = datetime.strptime(start_date, "%Y-%m-%d")
+    files_modified = []
+
+    for commit in repo.iter_commits():
+        commit_date = datetime.fromtimestamp(commit.committed_date)
+        if commit_date > since_date:
+            for entry in commit.stats.files.keys():
+                file_path = os.path.join(repo.working_dir, entry)
+                if file_path not in files_modified:
+                    files_modified.append(file_path)
+    return files_modified
+

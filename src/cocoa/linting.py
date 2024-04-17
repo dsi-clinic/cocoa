@@ -117,7 +117,7 @@ def black_python_file(file_path):
         formatted_content = black.format_file_contents(
             content,
             fast=False,
-            mode=black.FileMode(),
+            mode=black.FileMode(line_length=80),
         )
 
         # Compare original and formatted content
@@ -151,35 +151,109 @@ def is_code_in_functions_or_main(file_path):
         bool: True if all code is within functions or main block, False otherwise.
     """
 
-    with open(file_path, "r", encoding="utf-8") as file:
-        tree = ast.parse(file.read(), filename=file_path)
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            tree = ast.parse(file.read(), filename=file_path)
 
-    # Assume code is properly encapsulated until found otherwise
-    properly_encapsulated = True
+        # Assume code is properly encapsulated until found otherwise
+        properly_encapsulated = True
 
-    # Check each statement in the module
-    for node in tree.body:
-        # Ignore import statements
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
-            continue
+        # Check each statement in the module
+        for node in tree.body:
+            # Ignore import statements
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                continue
 
-        # Check for function or class definitions and main block
-        if not (
-            isinstance(
-                node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
-            )
-            or (
-                isinstance(node, ast.If)
-                and isinstance(node.test, ast.Compare)
-                and isinstance(node.test.ops[0], ast.Eq)
-                and isinstance(node.test.left, ast.Name)
-                and node.test.left.id == "__name__"
-                and isinstance(node.test.comparators[0], ast.Constant)
-                and node.test.comparators[0].value == "__main__"
-            )
-        ):
-            # Found code that is not in a function/class definition or the main block
-            properly_encapsulated = False
-            break
+            # Check for function or class definitions, main block, and module docstrings
+            if not (
+                isinstance(
+                    node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+                )
+                or (
+                    isinstance(node, ast.If)
+                    and isinstance(node.test, ast.Compare)
+                    and isinstance(node.test.ops[0], ast.Eq)
+                    and isinstance(node.test.left, ast.Name)
+                    and node.test.left.id == "__name__"
+                    and isinstance(node.test.comparators[0], ast.Constant)
+                    and node.test.comparators[0].value == "__main__"
+                )
+                or isinstance(node.value, ast.Constant)
+            ):
+                # Found code that is not in a function/class def or the main block
+                properly_encapsulated = False
+                break
 
-    return properly_encapsulated
+        return properly_encapsulated
+    except SyntaxError:
+        print(f"SyntaxError while parsing file {file_path}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+
+def functions_without_docstrings(file_path):
+    """
+    Identify all functions in a given Python file that do not have docstrings.
+
+    Args:
+        file_path (str): Path to the Python script.
+
+    Returns:
+        list: A list of names of functions that do not have docstrings.
+    """
+    with open(file_path, "r", encoding="utf-8") as source:
+        tree = ast.parse(source.read(), filename=file_path)
+
+    no_docstrings = []
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            # Check if first node in function body is a docstring
+            if not (
+                node.body
+                and isinstance(node.body[0], ast.Expr)
+                and isinstance(node.body[0].value, (ast.Str, ast.Constant))
+            ):
+                no_docstrings.append(node.name)
+    return no_docstrings
+
+
+class SubprocessVisitor(ast.NodeVisitor):
+    def __init__(self):
+        self.found = False
+
+    def visit_Import(self, node):
+        for alias in node.names:
+            if alias.name == "subprocess":
+                self.found = True
+        self.generic_visit(node)
+
+    def visit_ImportFrom(self, node):
+        if node.module == "subprocess":
+            self.found = True
+        self.generic_visit(node)
+
+
+def code_contains_subprocess(filepath):
+    """
+    Check if code uses subprocess.
+
+    Args:
+        file_path (str): The path to the Python script.
+
+    Returns:
+        bool: True if code contains subprocess, False otherwise.
+    """
+    try:
+        with open(filepath, "r") as file:
+            # Read the content of the file
+            file_content = file.read()
+            # Parse the content into an AST
+            tree = ast.parse(file_content)
+            # Create an instance of the visitor and run it on the AST
+            visitor = SubprocessVisitor()
+            visitor.visit(tree)
+            return visitor.found
+    except IOError as e:
+        print(f"Error opening or reading the file: {e}")
+        return False
