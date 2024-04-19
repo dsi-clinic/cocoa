@@ -84,11 +84,6 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
             elif file_path.endswith(".py"):
                 pyflake_results = pyflakes_python_file(file_path)
                 black_results = black_python_file(file_path)
-                if lint_flag:
-                    pylint_warnings = get_pylint_warnings(file_path)
-                    if len(pylint_warnings) > 0:
-                        for warning in pylint_warnings:
-                            print(f"{warning}")
 
                 if black_results:
                     print(
@@ -118,6 +113,11 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
                         f"{functions_no_docstrings}"
                     )
 
+                if lint_flag:
+                    pylint_warnings = get_pylint_warnings(file_path)
+                    if len(pylint_warnings) > 0:
+                        for warning in pylint_warnings:
+                            print(f"{warning}")
             if len(pyflake_results) > 0:
                 print(*pyflake_results, sep="\n")
 
