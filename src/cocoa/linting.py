@@ -93,23 +93,26 @@ def pyflakes_python_file(file_path):
 
 
 def get_pylint_warnings(filepath):
-    """Run pylint on the specified file and print warnings, ignoring specific error codes."""
+    """
+    Run pylint on the specified file and return warnings,
+    ignoring specific error codes.
+    """
     # Define the error codes to ignore
-    ignored_errors = {'E0401'}
+    ignored_errors = {"E0401"}
 
     # Capture the output in a string buffer
     output = StringIO()
     reporter = TextReporter(output=output)
-    
+
     try:
         # Run pylint with specified reporter and arguments
         Run([filepath], reporter=reporter, exit=False)
-        
+
         # Retrieve pylint output from the buffer
         pylint_output = output.getvalue()
         warnings = []
         # Filter out the ignored errors
-        for line in pylint_output.split('\n'):
+        for line in pylint_output.split("\n"):
             if not any(code in line for code in ignored_errors):
                 warnings.append(line)
         return warnings[1:-4]
