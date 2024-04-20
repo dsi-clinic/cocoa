@@ -78,14 +78,15 @@ def get_current_branch(repo_path):
     return None
 
 
-def clone_repo(repo_url, dir_path="temp_repo_dir"):
+def clone_repo(repo_url, dir_name=None):
     """
-    Clones a Git repository into a specified directory, or updates it if it already exists.
+    Clones a Git repository into a specified directory or a temporary directory if 
+    no directory is specified.
 
     Parameters:
     - repo_url (str): The URL of the repository to be cloned. This must not be empty.
-    - dir_path (str): The local directory path where the repository should be cloned.
-                      Default is "temp_repo_dir".
+    - dir_name (str, optional): The local directory name where the repository should 
+        be cloned. If None, a temporary directory is used.
 
     Returns:
     - str: The path to the cloned repository.
@@ -94,11 +95,16 @@ def clone_repo(repo_url, dir_path="temp_repo_dir"):
         raise ValueError("Repository URL must be provided.")
 
     try:
-        # check the dir path exist
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
+        # determine the directory path
+        if dir_name:
+            dir_path = dir_name
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            print(f"Using specified directory {dir_path} for cloning.")
+        else:
+            dir_path = tempfile.mkdtemp()
+            print(f"Using temporary directory {dir_path} for cloning.")
 
-        print(f"Cloning {repo_url} into {dir_path}")
         repo_path = os.path.join(dir_path, repo_url.split('/')[-1])
 
         # update but not clone if the dir existed
@@ -108,6 +114,7 @@ def clone_repo(repo_url, dir_path="temp_repo_dir"):
             repo = Repo(repo_path)
             repo.remote().fetch()
         else:
+            print(f"Cloning {repo_url} into {repo_path}")
             repo = Repo.clone_from(repo_url, repo_path)
 
         # get all branches
@@ -120,6 +127,7 @@ def clone_repo(repo_url, dir_path="temp_repo_dir"):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         raise
+
 
 def check_branch_names(repo_path):
     """
@@ -172,4 +180,3 @@ def files_after_date(repo_path, start_date):
                 if file_path not in files_modified:
                     files_modified.append(file_path)
     return files_modified
-
