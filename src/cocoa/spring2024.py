@@ -35,6 +35,5 @@ if __name__ == "__main__":
     # Example list of repositories to process
     repos = [
         "https://github.com/dsi-clinic/2023-Autumn-Clinic-Fermi-CaloDiffusionPaper",
-        "https://github.com/dsi-clinic/cocoa.git",
     ]
     process_repos(repos)
