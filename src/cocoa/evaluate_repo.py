@@ -50,12 +50,13 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
         ]
 
     for file_path in files_to_process:
-        print(f"Analyzing {file_path}:")
-        if file_path.endswith(".ipynb"):
-            analyze_notebook(file_path, no_filter_flag)
-        elif file_path.endswith(".py"):
-            analyze_python_file(file_path, lint_flag)
-        print("-" * 80)
+        if file_path.endswith(".ipynb") or file_path.endswith(".py"):
+            print(f"Analyzing {file_path}:")
+            if file_path.endswith(".ipynb"):
+                analyze_notebook(file_path, no_filter_flag)
+            elif file_path.endswith(".py"):
+                analyze_python_file(file_path, lint_flag)
+            print("-" * 80)
 
 
 def analyze_notebook(file_path, no_filter_flag):
