@@ -37,11 +37,10 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
     """
     paths_to_flag = ["__pycache__", "DS_Store", "ipynb_checkpoints"]
     cprint(
-        f"Currently analyzing branch {get_current_branch( dir_path)}",
+        f"Currently analyzing branch {get_current_branch(dir_path)}",
         color="green",
     )
 
-    # check for files after a specific data
     if start_date:
         files_to_process = files_after_date(dir_path, start_date)
     else:
@@ -49,88 +48,70 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
             os.path.join(root, f)
             for root, _, files in os.walk(dir_path)
             for f in files
+            if not any(x in os.path.join(root, f) for x in paths_to_flag)
         ]
 
-    pylint_warnings = []
-
     for file_path in files_to_process:
-
-        # Check if file path exists
-        if os.path.exists(file_path):
-            pyflake_results = []
-
+        if file_path.endswith(".ipynb") or file_path.endswith(".py"):
+            print(f"Analyzing {file_path}:")
             if file_path.endswith(".ipynb"):
-                (
-                    num_cells,
-                    num_lines,
-                    num_functions,
-                    max_lines_in_cell,
-                ) = process_notebook(file_path)
-
-                if no_filter_flag or (
-                    num_cells > MAX_CELLS_PER_NOTEBOOK
-                    or max_lines_in_cell > MAX_LINES_PER_CELL
-                    or num_functions > MAX_FUNCTIONS_PER_NOTEBOOK
-                ):
-                    print(f"File: {file_path}")
-                    print(f"\tNumber of cells: {num_cells}")
-                    print(f"\tLines of code: {num_lines}")
-                    print(f"\tNumber of function definitions: {num_functions}")
-                    print(f"\tMax lines in a cell: {max_lines_in_cell}")
-                    print("-" * 40)
-
-                pyflake_results = pyflakes_notebook(file_path)
-
+                analyze_notebook(file_path, no_filter_flag)
             elif file_path.endswith(".py"):
-                pyflake_results = pyflakes_python_file(file_path)
-                black_results = black_python_file(file_path)
-
-                if black_results:
-                    print(
-                        f"There were {len(black_results)} changes "
-                        f"on file {file_path}. Please run black."
-                    )
-
-                # check is_code_in_functions_or_main
-                if not is_code_in_functions_or_main(file_path):
-                    print(
-                        f"Code outside functions or main block detected in {file_path}"
-                    )
-
-                # check if code uses subprocess
-                if code_contains_subprocess(file_path):
-                    print(f"Warning: subprocess usage detected in {file_path}")
-
-                # check if functions have docstrings
-                functions_no_docstrings = functions_without_docstrings(
-                    file_path
-                )
-
-                if functions_no_docstrings:
-                    print(
-                        f"Following functions without docstrings"
-                        f" detected in {file_path}:"
-                        f"{functions_no_docstrings}"
-                    )
-
-                if lint_flag:
-                    pylint_warnings = get_pylint_warnings(file_path)
-                    if len(pylint_warnings) > 0:
-                        for warning in pylint_warnings:
-                            print(f"{warning}")
-            if len(pyflake_results) > 0:
-                print(*pyflake_results, sep="\n")
-
-            if len([x for x in paths_to_flag if x in file_path]) > 0:
-                print(
-                    f"Warning: the file {file_path} should be \
-                      filtered via gitignore."
-                )
-
-    return None
+                analyze_python_file(file_path, lint_flag)
+            print("-" * 80)
 
 
-def evaluate_repo(dir_path, lint_flag, start_date):
+def analyze_notebook(file_path, no_filter_flag):
+    num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(
+        file_path
+    )
+    pyflake_results = pyflakes_notebook(file_path)
+    print_results("PyFlakes", pyflake_results)
+    if no_filter_flag or (
+        num_cells > MAX_CELLS_PER_NOTEBOOK
+        or max_lines_in_cell > MAX_LINES_PER_CELL
+        or num_functions > MAX_FUNCTIONS_PER_NOTEBOOK
+    ):
+        print(f"\tNumber of cells: {num_cells}")
+        print(f"\tLines of code: {num_lines}")
+        print(f"\tNumber of function definitions: {num_functions}")
+        print(f"\tMax lines in a cell: {max_lines_in_cell}")
+
+
+def analyze_python_file(file_path, lint_flag):
+    pyflake_results = pyflakes_python_file(file_path)
+    print_results("PyFlakes", pyflake_results)
+    if lint_flag:
+        pylint_warnings = get_pylint_warnings(file_path)
+        print_results("Pylint", pylint_warnings)
+
+    black_results = black_python_file(file_path)
+    if black_results:
+        print(f"\tPlease run black. {len(black_results)} changes needed.")
+
+    if not is_code_in_functions_or_main(file_path):
+        print("\tCode outside functions or main block detected.")
+
+    if code_contains_subprocess(file_path):
+        print("\tWarning: subprocess usage detected.")
+
+    functions_no_docstrings = functions_without_docstrings(file_path)
+    if functions_no_docstrings:
+        print(
+            "\tFunctions without docstrings detected:", functions_no_docstrings
+        )
+
+
+def print_results(tool_name, results):
+    if results:
+        print(f"{tool_name} found {len(results)} issues:")
+        for result in results[:5]:
+            print(f"  {result}")
+        if len(results) > 5:
+            print(f"  ...and {len(results) - 5} more issues.")
+
+
+def evaluate_repo(dir_path, lint_flag, start_date=None):
     """
     This is the entry point to running the automated code review
     It should be called from inside the docker container.

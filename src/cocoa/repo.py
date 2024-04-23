@@ -77,8 +77,8 @@ def get_current_branch(repo_path):
 
 def clone_repo(repo_url, dir_path="temp_repo_dir"):
     """
-    Clones a Git repository into a specified directory, or
-    updates it if it already exists.
+    Clones a Git repository into a specified directory, or updates it if it already
+    exists.
 
     Parameters:
     - repo_url (str): The URL of the repository to be cloned. This must not be empty.
