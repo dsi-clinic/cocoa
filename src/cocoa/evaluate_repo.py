@@ -37,7 +37,9 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
     """
     paths_to_flag = ["__pycache__", "DS_Store", "ipynb_checkpoints"]
     cprint(
-        f"Currently analyzing branch {get_current_branch(dir_path)}", color="green")
+        f"Currently analyzing branch {get_current_branch(dir_path)}",
+        color="green",
+    )
 
     if start_date:
         files_to_process = files_after_date(dir_path, start_date)
@@ -61,11 +63,14 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
 
 def analyze_notebook(file_path, no_filter_flag):
     num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(
-        file_path)
+        file_path
+    )
+    pyflake_results = pyflakes_notebook(file_path)
+    print_results("PyFlakes", pyflake_results)
     if no_filter_flag or (
-        num_cells > MAX_CELLS_PER_NOTEBOOK or
-        max_lines_in_cell > MAX_LINES_PER_CELL or
-        num_functions > MAX_FUNCTIONS_PER_NOTEBOOK
+        num_cells > MAX_CELLS_PER_NOTEBOOK
+        or max_lines_in_cell > MAX_LINES_PER_CELL
+        or num_functions > MAX_FUNCTIONS_PER_NOTEBOOK
     ):
         print(f"\tNumber of cells: {num_cells}")
         print(f"\tLines of code: {num_lines}")
@@ -92,7 +97,9 @@ def analyze_python_file(file_path, lint_flag):
 
     functions_no_docstrings = functions_without_docstrings(file_path)
     if functions_no_docstrings:
-        print("\tFunctions without docstrings detected:", functions_no_docstrings)
+        print(
+            "\tFunctions without docstrings detected:", functions_no_docstrings
+        )
 
 
 def print_results(tool_name, results):
