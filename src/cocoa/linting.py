@@ -115,7 +115,7 @@ def get_pylint_warnings(filepath):
         for line in pylint_output.split("\n"):
             if not any(code in line for code in ignored_errors):
                 warnings.append(line)
-        return warnings[1:-4]
+        return warnings[1:-5]
     except Exception as e:
         print(f"An error occurred while running pylint: {e}")
 
