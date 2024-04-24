@@ -222,21 +222,26 @@ def functions_without_docstrings(file_path):
     Returns:
         list: A list of names of functions that do not have docstrings.
     """
-    with open(file_path, "r", encoding="utf-8") as source:
-        tree = ast.parse(source.read(), filename=file_path)
 
-    no_docstrings = []
+    try:
+        with open(file_path, "r", encoding="utf-8") as source:
+            tree = ast.parse(source.read(), filename=file_path)
 
-    for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef):
-            # Check if first node in function body is a docstring
-            if not (
-                node.body
-                and isinstance(node.body[0], ast.Expr)
-                and isinstance(node.body[0].value, (ast.Str, ast.Constant))
-            ):
-                no_docstrings.append(node.name)
-    return no_docstrings
+        no_docstrings = []
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                # Check if first node in function body is a docstring
+                if not (
+                    node.body
+                    and isinstance(node.body[0], ast.Expr)
+                    and isinstance(node.body[0].value, (ast.Str, ast.Constant))
+                ):
+                    no_docstrings.append(node.name)
+        return no_docstrings
+    except IOError as e:
+        print(f"Error opening or reading the file: {e}")
+        return []
 
 
 class SubprocessVisitor(ast.NodeVisitor):
