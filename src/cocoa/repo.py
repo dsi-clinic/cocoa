@@ -6,10 +6,7 @@ import os
 from datetime import datetime
 
 import git
-
-import os
-import tempfile
-from git import Repo, GitCommandError
+from git import GitCommandError, Repo
 
 
 def is_git_repo(repo_path):
@@ -80,8 +77,13 @@ def get_current_branch(repo_path):
 
 def clone_repo(repo_url, dir_name=None):
     """
+<<<<<<< HEAD
     Clones a Git repository into a specified directory or a temporary directory if 
     no directory is specified.
+=======
+    Clones a Git repository into a specified directory, or updates it if it already
+    exists.
+>>>>>>> main
 
     Parameters:
     - repo_url (str): The URL of the repository to be cloned. This must not be empty.
@@ -105,12 +107,18 @@ def clone_repo(repo_url, dir_name=None):
             dir_path = tempfile.mkdtemp()
             print(f"Using temporary directory {dir_path} for cloning.")
 
+<<<<<<< HEAD
         repo_path = os.path.join(dir_path, repo_url.split('/')[-1])
+=======
+        print(f"Cloning {repo_url} into {dir_path}")
+        repo_path = os.path.join(dir_path, repo_url.split("/")[-1])
+>>>>>>> main
 
         # update but not clone if the dir existed
         if os.path.exists(repo_path):
             print(
-                f"The directory {repo_path} already exists. Fetching the latest changes.")
+                f"The directory {repo_path} already exists. Fetching changes."
+            )
             repo = Repo(repo_path)
             repo.remote().fetch()
         else:
@@ -118,7 +126,7 @@ def clone_repo(repo_url, dir_name=None):
             repo = Repo.clone_from(repo_url, repo_path)
 
         # get all branches
-        repo.git.fetch('--all')
+        repo.git.fetch("--all")
 
         return repo_path
     except GitCommandError as e:
