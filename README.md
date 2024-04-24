@@ -47,8 +47,15 @@ A few important notes:
 1. This will get branch information for all branches.
 1. This will only run the analysis (`pyflakes` on python files) for the code _in the current branch_. So if you run this while your current branch is `main` it will run on `main`.
 
-If you want to do a full linting, then you can add the argument "--lint" to the command, such as:
+#### Options
+If you want to do linting on Python files, then you can add the argument "--lint" to the command:
 
 ```bash
 cocoa /path/to/repo --lint
+```
+
+Results are truncated by default. To print all results, use the verbose option:
+
+```bash
+cocoa /path/to/repo --verbose
 ```

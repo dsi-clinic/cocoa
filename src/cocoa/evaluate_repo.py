@@ -31,7 +31,9 @@ from cocoa.repo import (
 )
 
 
-def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
+def walk_and_process(
+    dir_path, no_filter_flag, lint_flag, start_date=None, verbose=False
+):
     """
     Walk through directory and process all python and jupyter notebook files.
     """
@@ -55,18 +57,19 @@ def walk_and_process(dir_path, no_filter_flag, lint_flag, start_date=None):
         if file_path.endswith(".ipynb") or file_path.endswith(".py"):
             print(f"Analyzing {file_path}:")
             if file_path.endswith(".ipynb"):
-                analyze_notebook(file_path, no_filter_flag)
+                analyze_notebook(file_path, no_filter_flag, verbose)
             elif file_path.endswith(".py"):
-                analyze_python_file(file_path, lint_flag)
+                analyze_python_file(file_path, lint_flag, verbose)
             print("-" * 80)
 
 
-def analyze_notebook(file_path, no_filter_flag):
+def analyze_notebook(file_path, no_filter_flag, verbose):
+    """Analyze a notebook"""
     num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(
         file_path
     )
     pyflake_results = pyflakes_notebook(file_path)
-    print_results("PyFlakes", pyflake_results)
+    print_results("PyFlakes", pyflake_results, verbose=verbose)
     if no_filter_flag or (
         num_cells > MAX_CELLS_PER_NOTEBOOK
         or max_lines_in_cell > MAX_LINES_PER_CELL
@@ -78,14 +81,17 @@ def analyze_notebook(file_path, no_filter_flag):
         print(f"\tMax lines in a cell: {max_lines_in_cell}")
 
 
-def analyze_python_file(file_path, lint_flag):
+def analyze_python_file(file_path, lint_flag, verbose):
+    """Analyze a Python file"""
     pyflake_results = pyflakes_python_file(file_path)
-    print_results("PyFlakes", pyflake_results)
-    if lint_flag:
-        pylint_warnings = get_pylint_warnings(file_path)
-        print_results("Pylint", pylint_warnings)
-
+    pylint_warnings = get_pylint_warnings(file_path)
     black_results = black_python_file(file_path)
+
+    if lint_flag:
+        print_results("Pylint", pylint_warnings, verbose=verbose)
+
+    print_results("PyFlakes", pyflake_results, verbose=verbose)
+
     if black_results:
         print(f"\tPlease run black. {len(black_results)} changes needed.")
 
@@ -102,16 +108,22 @@ def analyze_python_file(file_path, lint_flag):
         )
 
 
-def print_results(tool_name, results):
+def print_results(tool_name, results, verbose=False):
+    """Print results from pylint or pyflake"""
     if results:
-        print(f"{tool_name} found {len(results)} issues:")
-        for result in results[:5]:
-            print(f"  {result}")
-        if len(results) > 5:
-            print(f"  ...and {len(results) - 5} more issues.")
+        if verbose:
+            print(f"{tool_name} found {len(results)} issues:")
+            for result in results:
+                print(f"  {result}")
+        else:
+            print(f"{tool_name} found {len(results)} issues:")
+            for result in results[:5]:
+                print(f"  {result}")
+            if len(results) > 5:
+                print(f"  ...and {len(results) - 5} more issues.")
 
 
-def evaluate_repo(dir_path, lint_flag, start_date=None):
+def evaluate_repo(dir_path, lint_flag, start_date=None, verbose=False):
     """
     This is the entry point to running the automated code review
     It should be called from inside the docker container.
@@ -127,7 +139,13 @@ def evaluate_repo(dir_path, lint_flag, start_date=None):
 
     check_branch_names(dir_path)
     get_remote_branches_info(dir_path)
-    walk_and_process(dir_path, None, lint_flag=lint_flag, start_date=start_date)
+    walk_and_process(
+        dir_path,
+        None,
+        lint_flag=lint_flag,
+        start_date=start_date,
+        verbose=verbose,
+    )
     return 0
 
 
@@ -135,7 +153,10 @@ def main():
     parser = argparse.ArgumentParser(description="COCOA CLI")
 
     parser.add_argument("repo", help="Path to a repository root directory")
-    parser.add_argument("--lint", help="Lint option", action="store_true")
+    parser.add_argument("--lint", help="Run linting", action="store_true")
+    parser.add_argument(
+        "--verbose", help="Print all results", action="store_true"
+    )
     parser.add_argument(
         "--date",
         default=None,
@@ -148,8 +169,9 @@ def main():
     dir_path = args.repo
     lint_flag = args.lint
     start_date = args.date
+    verbose = args.verbose
 
-    evaluate_repo(dir_path, lint_flag, start_date)
+    evaluate_repo(dir_path, lint_flag, start_date, verbose)
 
 
 if __name__ == "__main__":

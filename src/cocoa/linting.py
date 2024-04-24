@@ -125,6 +125,10 @@ def get_pylint_warnings(filepath):
 
 
 def black_python_file(file_path):
+    """
+    Runs black on a python file. Returns a list of diffs from
+    the original file.
+    """
     try:
         # Read the content of the file
         with open(file_path, "r", encoding="utf-8") as f:
