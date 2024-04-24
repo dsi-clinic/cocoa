@@ -3,6 +3,7 @@ Utilities for evaluating the status and structure of a git repository
 """
 
 import os
+import tempfile
 from datetime import datetime
 
 import git
@@ -77,17 +78,12 @@ def get_current_branch(repo_path):
 
 def clone_repo(repo_url, dir_name=None):
     """
-<<<<<<< HEAD
-    Clones a Git repository into a specified directory or a temporary directory if 
+    Clones a Git repository into a specified directory or a temporary directory if
     no directory is specified.
-=======
-    Clones a Git repository into a specified directory, or updates it if it already
-    exists.
->>>>>>> main
 
     Parameters:
     - repo_url (str): The URL of the repository to be cloned. This must not be empty.
-    - dir_name (str, optional): The local directory name where the repository should 
+    - dir_name (str, optional): The local directory name where the repository should
         be cloned. If None, a temporary directory is used.
 
     Returns:
@@ -107,12 +103,8 @@ def clone_repo(repo_url, dir_name=None):
             dir_path = tempfile.mkdtemp()
             print(f"Using temporary directory {dir_path} for cloning.")
 
-<<<<<<< HEAD
-        repo_path = os.path.join(dir_path, repo_url.split('/')[-1])
-=======
         print(f"Cloning {repo_url} into {dir_path}")
         repo_path = os.path.join(dir_path, repo_url.split("/")[-1])
->>>>>>> main
 
         # update but not clone if the dir existed
         if os.path.exists(repo_path):
