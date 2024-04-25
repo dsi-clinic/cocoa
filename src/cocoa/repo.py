@@ -19,7 +19,7 @@ def is_git_repo(repo_path):
 
 def get_remote_branches_info(repo_path, display=True):
     """
-    This function reutrns the branch information from the
+    This function returns the branch information from the
     remote repository.
     """
     repo = git.Repo(repo_path)
