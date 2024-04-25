@@ -14,7 +14,10 @@ def is_git_repo(repo_path):
     """
     Return a boolean if the directory supplied is a git repo.
     """
-    return git.Repo(repo_path).git_dir is not None
+    try:
+        return git.Repo(repo_path).git_dir is not None
+    except git.InvalidGitRepositoryError:
+        raise Exception(f"Not a valid git repo: {repo_path}")
 
 
 def get_remote_branches_info(repo_path, display=True):
