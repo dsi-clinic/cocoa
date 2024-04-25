@@ -6,7 +6,7 @@ The goals of this codebase is to provide a quick and easy way to review code and
 
 ## Installation
 
-```pip install cocoa```
+```pip install dsi-cocoa```
 
 To install the package from the local files, run the following command from the root of the repository:
 ```bash
