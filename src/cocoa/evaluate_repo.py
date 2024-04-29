@@ -54,6 +54,11 @@ def walk_and_process(
         ]
 
     for file_path in files_to_process:
+        if not os.path.exists(file_path):
+            print(
+                f"Notice: The file '{file_path}' does not exist or has been moved. Skipping analysis.")
+            continue
+
         if file_path.endswith(".ipynb") or file_path.endswith(".py"):
             print(f"Analyzing {file_path}:")
             if file_path.endswith(".ipynb"):
