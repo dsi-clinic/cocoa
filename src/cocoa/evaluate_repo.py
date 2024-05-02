@@ -24,9 +24,11 @@ from cocoa.linting import (
 from cocoa.notebooks import process_notebook
 from cocoa.repo import (
     check_branch_names,
+    clone_repo,
     files_after_date,
     get_current_branch,
     get_remote_branches_info,
+    is_git_remote_repo,
     is_git_repo,
 )
 
@@ -124,29 +126,36 @@ def print_results(tool_name, results, verbose=False):
                 print(f"  ...and {len(results) - 5} more issues.")
 
 
-def evaluate_repo(dir_path, lint_flag, start_date=None, verbose=False):
+def evaluate_repo(path_or_url, lint_flag, start_date=None, verbose=False):
     """
-    This is the entry point to running the automated code review
-    It should be called from inside the docker container.
+    This is the entry point to running the automated code review.
     """
 
-    if not os.path.isdir(dir_path):
-        print(f"Error: {dir_path} is not a valid directory.")
-        exit(1)
+    if os.path.isdir(path_or_url):
+        if not is_git_repo(path_or_url):
+            print(f"Error: {path_or_url} is not a Git repository.")
+            exit(1)
 
-    if not is_git_repo(dir_path):
-        print(f"Error: {dir_path} is not a Git repository.")
+        check_branch_names(path_or_url)
+        get_remote_branches_info(path_or_url)
+        walk_and_process(
+            path_or_url,
+            None,
+            lint_flag=lint_flag,
+            start_date=start_date,
+            verbose=verbose,
+        )
+    elif is_git_remote_repo(path_or_url):
+        repo_path = clone_repo(path_or_url)
+        evaluate_repo(
+            repo_path,
+            lint_flag=lint_flag,
+            start_date=start_date,
+            verbose=verbose,
+        )
+    else:
+        print(f"Error: {path_or_url} is not a Git repository URL.")
         exit(1)
-
-    check_branch_names(dir_path)
-    get_remote_branches_info(dir_path)
-    walk_and_process(
-        dir_path,
-        None,
-        lint_flag=lint_flag,
-        start_date=start_date,
-        verbose=verbose,
-    )
     return 0
 
 
