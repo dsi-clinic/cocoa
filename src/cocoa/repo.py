@@ -7,6 +7,7 @@ import tempfile
 from datetime import datetime
 
 import git
+import requests
 from git import GitCommandError, Repo
 
 
@@ -183,3 +184,18 @@ def files_after_date(repo_path, start_date):
                 if file_path not in files_modified:
                     files_modified.append(file_path)
     return files_modified
+
+
+def is_git_remote_repo(url):
+    # Normalize the URL by ensuring it ends with '.git'
+    if not url.endswith(".git"):
+        url += ".git"
+
+    try:
+        response = requests.get(url)
+        if response.ok:
+            return True
+    except requests.RequestException as e:
+        print(f"Failed to access {url}: {e}")
+
+    return False
