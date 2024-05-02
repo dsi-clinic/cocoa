@@ -44,26 +44,28 @@ def pyflakes_notebook(path_to_notebook):
     :param path_to_notebook: path to the notebook file.
     :return: list of warnings and errors from pyflakes.
     """
-    # Convert notebook to Python script
-    exporter = PythonExporter()
-    script, _ = exporter.from_filename(path_to_notebook)
+    try:
+        # Convert notebook to Python script
+        exporter = PythonExporter()
+        script, _ = exporter.from_filename(path_to_notebook)
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", delete=False, suffix=".py"
-    ) as temp:
-        temp_name = temp.name
-        temp.write(script)
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".py"
+        ) as temp:
+            temp_name = temp.name
+            temp.write(script)
 
-    errors_and_warnings = pyflakes_python_file(temp_name)
-    reformatted_errors_and_warnings = convert_temp_names_to_originals(
-        errors_and_warnings,
-        path_to_notebook,
-    )
+        errors_and_warnings = pyflakes_python_file(temp_name)
+        reformatted_errors_and_warnings = convert_temp_names_to_originals(
+            errors_and_warnings,
+            path_to_notebook,
+        )
 
-    # Delete temporary file
-    os.remove(temp_name)
-    return reformatted_errors_and_warnings
-
+        # Delete temporary file
+        os.remove(temp_name)
+        return reformatted_errors_and_warnings
+    except Exception as e:
+        print(f"An error occurred while running pyflakes: {e}")
 
 def pyflakes_python_file(file_path):
     """
