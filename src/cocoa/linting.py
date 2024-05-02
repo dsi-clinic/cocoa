@@ -67,6 +67,7 @@ def pyflakes_notebook(path_to_notebook):
     except Exception as e:
         print(f"An error occurred while running pyflakes: {e}")
 
+
 def pyflakes_python_file(file_path):
     """
     Run a python file through pyflakes. returns the number of warnings raised.
