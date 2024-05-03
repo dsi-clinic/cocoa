@@ -25,13 +25,13 @@ jobs:
         with:
           tag: "$NEXT_VERSION"
 
-      # Print result using the env variable.
-      - run: |
-        echo "Tag already present: ${{ env.TAG_EXISTS }}"
+      # # Print result using the env variable.
+      # - run: |
+      #   echo "Tag already present: ${{ env.TAG_EXISTS }}"
 
-      # Print result using the action output.
-      - run: |
-        echo "Tag already present: ${{ steps.tag_create.outputs.tag_exists }}"
+      # # Print result using the action output.
+      # - run: |
+      #   echo "Tag already present: ${{ steps.tag_create.outputs.tag_exists }}"
 
 
       # - name: Use environment variable
