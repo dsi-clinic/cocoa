@@ -1,0 +1,17 @@
+name: Increment tag
+
+on:
+  push:
+    branches:
+      - thannifan/increment
+
+jobs:
+  increment:
+    name: Increment version tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: rmeneely/git-next-version@v1
+        with:
+          set_next_version_tag: 'true'
+          new_suffix: '-test'
