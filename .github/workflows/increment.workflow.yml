@@ -1,4 +1,4 @@
-name: Increment tag
+name: Increment and create tag
 
 on:
   push:
