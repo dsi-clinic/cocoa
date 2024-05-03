@@ -23,7 +23,7 @@ jobs:
         uses: rickstaa/action-create-tag@v1
         id: "tag_create"
         with:
-          tag: "$NEXT_VERSION"
+          tag: $NEXT_VERSION
 
       # # Print result using the env variable.
       # - run: |
