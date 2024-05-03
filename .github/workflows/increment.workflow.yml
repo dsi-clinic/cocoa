@@ -17,7 +17,7 @@ jobs:
         uses: rmeneely/git-next-version@v1
         with:
           new_suffix: '-test'
-          auto_increment: 'true'
+          # auto_increment: 'true'
       - name: Print version tag
         run: echo "Next version is $NEXT_VERSION"
       - name: Create tag
