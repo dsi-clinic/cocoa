@@ -15,8 +15,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Run increment action
         uses: rmeneely/git-next-version@v1
-        with:
-          new_suffix: '-test'
+        # with:
+          # new_suffix: '-test'
       - name: Print version tag
         run: echo "Next version is $NEXT_VERSION"
       - name: Create tag
