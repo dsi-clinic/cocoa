@@ -11,7 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: rmeneely/git-next-version@v1
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+      - name: Run increment action
+        uses: rmeneely/git-next-version@v1
         with:
           set_next_version_tag: 'true'
           new_suffix: '-test'
