@@ -25,7 +25,7 @@ jobs:
         uses: rickstaa/action-create-tag@v1
         id: "tag_create"
         with:
-          tag: $NEXT_VERSION
+          tag: ${{ env.NEXT_VERSION }}
 
       # # Print result using the env variable.
       # - run: |
@@ -35,6 +35,3 @@ jobs:
       # - run: |
       #   echo "Tag already present: ${{ steps.tag_create.outputs.tag_exists }}"
 
-
-      - name: Use environment variable
-        run: echo "Next version is $NEXT_VERSION"
