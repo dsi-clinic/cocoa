@@ -1,0 +1,37 @@
+name: Cocoa Error Analysis
+
+on:
+  push:
+    branches:
+      - ridhi-error-badge # Add other branches as needed
+
+jobs:
+  cocoa_check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'  # Specify the Python version you need
+
+    - name: Install cocoa
+      run: pip3 install dsi-cocoa  
+
+    - name: Run cocoa
+      run: cocoa /Users/ridhipurohit/Documents/GitHub/2023-autumn-internet-equity --lint --verbose --date "2024-04-10" 
+      id: cocoa_run
+
+    - name: Check output
+      run: |
+        if grep -q 'Warning:' "${{ steps.cocoa_run.outputs.stdout }}"; then
+          echo "Error detected"
+          exit 1
+        fi
+      shell: bash
+
+    - name: Success
+      run: echo "No critical issues found."
