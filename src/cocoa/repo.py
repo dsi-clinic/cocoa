@@ -34,12 +34,14 @@ def get_remote_branches_info(repo_path, display=True):
         if branch.remote_head == "HEAD":
             continue
 
-        commits_diff = repo.git.rev_list(
-            "--left-right", "--count", f"origin/main...{branch.name}"
-        )
-        num_ahead, num_behind = commits_diff.split("\t")
-        branch_info.append([branch.name, num_ahead, num_behind])
-
+        try:
+            commits_diff = repo.git.rev_list(
+                "--left-right", "--count", f"origin/main...{branch.name}"
+            )
+            num_ahead, num_behind = commits_diff.split("\t")
+            branch_info.append([branch.name, num_ahead, num_behind])
+        except git.GitCommandError:
+            print("Error: Git command error occurred.")
     if display:
         for branch, behind, ahead in branch_info:
             print(f"Branch: {branch}")
