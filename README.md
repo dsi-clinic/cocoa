@@ -8,7 +8,7 @@ The goals of this codebase is to provide a quick and easy way to review code and
 
 ```pip install dsi-cocoa```
 
-To install the package from the local files, run the following command from the root of the repository:
+To install the package locally, run the following command from the root of the repository:
 ```bash
 python3 -m pip install .
 ```
@@ -48,7 +48,7 @@ A few important notes:
 1. This will only run the analysis (`pyflakes` on python files) for the code _in the current branch_. So if you run this while your current branch is `main` it will run on `main`.
 
 #### Options
-If you want to do linting on Python files, then you can add the argument "--lint" to the command:
+If you want to turn on linting, add the argument "--lint":
 
 ```bash
 cocoa /path/to/repo --lint
@@ -59,6 +59,14 @@ Results are truncated by default. To print all results, use the verbose option:
 ```bash
 cocoa /path/to/repo --verbose
 ```
+
+To report remote branch information, use the `--branchinfo` option.
+
+To run cocoa on files changed after a certain date, use the `--date` option with a date formatted as below.
+```bash
+cocoa /path/to/repo --date YYYY-MM-DD
+```
+
 
 ### Checks
 

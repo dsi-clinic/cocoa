@@ -145,7 +145,9 @@ def print_results(tool_name, results, verbose=False):
                 print(f"\t  ...and {len(results) - 5} more issues.")
 
 
-def evaluate_repo(path_or_url, lint_flag, start_date=None, verbose=False):
+def evaluate_repo(
+    path_or_url, lint_flag, start_date=None, verbose=False, branchinfo=False
+):
     """
     This is the entry point to running the automated code review.
     """
@@ -156,7 +158,8 @@ def evaluate_repo(path_or_url, lint_flag, start_date=None, verbose=False):
             exit(1)
 
         check_branch_names(path_or_url)
-        get_remote_branches_info(path_or_url)
+        if branchinfo:
+            get_remote_branches_info(path_or_url)
         walk_and_process(
             path_or_url,
             None,
@@ -192,6 +195,9 @@ def main():
         help="Start date in YYYY-MM-DD format to filter files by commit date",
         type=str,
     )
+    parser.add_argument(
+        "--branchinfo", help="Report branch information", action="store_true"
+    )
 
     args = parser.parse_args()
 
@@ -199,8 +205,9 @@ def main():
     lint_flag = args.lint
     start_date = args.date
     verbose = args.verbose
+    branchinfo = args.branchinfo
 
-    evaluate_repo(dir_path, lint_flag, start_date, verbose)
+    evaluate_repo(dir_path, lint_flag, start_date, verbose, branchinfo)
 
 
 if __name__ == "__main__":
