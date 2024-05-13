@@ -11,6 +11,7 @@ from cocoa.constants import (
     MAX_CELLS_PER_NOTEBOOK,
     MAX_FUNCTIONS_PER_NOTEBOOK,
     MAX_LINES_PER_CELL,
+    PREAMBLE_TEXT,
 )
 from cocoa.linting import (
     black_python_file,
@@ -151,7 +152,7 @@ def evaluate_repo(
     """
     This is the entry point to running the automated code review.
     """
-
+    cprint(PREAMBLE_TEXT, color="green")
     if os.path.isdir(path_or_url):
         if not is_git_repo(path_or_url):
             print(f"Error: {path_or_url} is not a Git repository.")
