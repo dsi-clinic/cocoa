@@ -4,6 +4,7 @@ Main entry point for complete evaluation of a python codebase in git
 
 import argparse
 import os
+import shutil
 
 from termcolor import cprint
 
@@ -176,8 +177,11 @@ def evaluate_repo(
             start_date=start_date,
             verbose=verbose,
         )
+        shutil.rmtree(repo_path)
     else:
-        print(f"Error: {path_or_url} is not a Git repository URL.")
+        print(
+            f"Error: {path_or_url} is either private or not a git repository. 404."
+        )
         exit(1)
     return 0
 
