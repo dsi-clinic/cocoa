@@ -9,6 +9,8 @@ on:
 jobs:
   cocoa_check:
     runs-on: ubuntu-latest
+    env:
+      DATE_PARAM: ${{ env.DATE_PARAM }} 
 
     steps:
     - name: Checkout code
@@ -27,11 +29,20 @@ jobs:
     - name: Run cocoa and check output
       id: cocoa_run
       run: |
-        output=$(cocoa . --lint --verbose)
+        if [ -z "${DATE_PARAM}" ]; then
+          echo "Running without date parameter."
+          output=$(cocoa . --lint --verbose)
+        else
+          echo "Running with date parameter: ${DATE_PARAM}"
+          output=$(cocoa . --lint --verbose --date "${DATE_PARAM}")
+        fi
+    
         echo "$output"
+        
         if echo "$output" | grep -iq 'Warning'; then
           echo "Warning detected."
         fi
+
         if echo "$output" | grep -iq 'Error'; then
           echo "Error detected."
           exit 1  
