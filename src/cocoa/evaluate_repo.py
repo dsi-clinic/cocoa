@@ -3,6 +3,7 @@ Main entry point for complete evaluation of a python codebase in git
 """
 
 import argparse
+import shutil
 import os
 
 from termcolor import cprint
@@ -170,12 +171,14 @@ def evaluate_repo(
         )
     elif is_git_remote_repo(path_or_url):
         repo_path = clone_repo(path_or_url)
+        print(f"{repo_path} should be automatically deleted.")
         evaluate_repo(
             repo_path,
             lint_flag=lint_flag,
             start_date=start_date,
             verbose=verbose,
         )
+        shutil.rmtree(repo_path)
     else:
         print(f"Error: {path_or_url} is not a Git repository URL.")
         exit(1)
