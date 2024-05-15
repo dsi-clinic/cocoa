@@ -27,7 +27,7 @@ jobs:
     - name: Run cocoa and check output
       id: cocoa_run
       run: |
-        echo $REVIEW_AFTER_DATE
+        echo "Review After Date: '${{ env.REVIEW_AFTER_DATE }}'"
         if [ -z "$REVIEW_AFTER_DATE" ]; then
           echo "Running DSI Standards check."
           output=$(cocoa . --lint --verbose)
