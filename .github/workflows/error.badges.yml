@@ -32,8 +32,8 @@ jobs:
           echo "Running without date parameter."
           output=$(cocoa . --lint --verbose)
         else
-          echo "Running with date parameter: ${env.REVIEW_AFTER_DATE}"
-          output=$(cocoa . --lint --verbose --date "${env.REVIEW_AFTER_DATE}")
+          echo "Running with date parameter: ${REVIEW_AFTER_DATE}"
+          output=$(cocoa . --lint --verbose --date "${REVIEW_AFTER_DATE}")
         fi
     
         echo "$output"
