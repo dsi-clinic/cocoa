@@ -29,10 +29,10 @@ jobs:
       id: cocoa_run
       run: |
         if [ -z "${{ env.REVIEW_AFTER_DATE }}" ]; then
-          echo "Running without date parameter."
+          echo "Running DSI Standards check."
           output=$(cocoa . --lint --verbose)
         else
-          echo "Running with date parameter: ${{ env.REVIEW_AFTER_DATE }}"
+          echo "Running DSI Standards check from date: ${{ env.REVIEW_AFTER_DATE }}"
           output=$(cocoa . --lint --verbose --date "${{ env.REVIEW_AFTER_DATE }}")
         fi
     
