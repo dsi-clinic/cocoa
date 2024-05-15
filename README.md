@@ -1,5 +1,8 @@
 # Clinic Opinionated Codebase Oversight and Analysis
 
+[![Cocoa Error Analysis](https://github.com/dsi-clinic/cocoa/actions/workflows/error.badges.yml/badge.svg)](https://github.com/dsi-clinic/cocoa/actions/workflows/error.badges.yml)
+
+
 This repository was developed in order to generate automated reports on how well codebases adhere to the [coding standards](https://github.com/dsi-clinic/coding-standards) of the University of Chicago's DSI [Clinic course](https://datascience.uchicago.edu/education/data-science-clinic/).
 
 The goals of this codebase is to provide a quick and easy way to review code and to alert contributors where their code may be failing.
@@ -8,8 +11,7 @@ The goals of this codebase is to provide a quick and easy way to review code and
 
 `pip install dsi-cocoa`
 
-To install the package from the local files, run the following command from the root of the repository:
-
+To install the package locally, run the following command from the root of the repository:
 ```bash
 python3 -m pip install .
 ```
@@ -53,7 +55,7 @@ A few important notes:
 
 #### Options
 
-If you want to do linting on Python files, then you can add the argument "--lint" to the command:
+If you want to turn on linting, add the argument "--lint":
 
 ```bash
 cocoa /path/to/repo --lint
@@ -64,6 +66,21 @@ Results are truncated by default. To print all results, use the verbose option:
 ```bash
 cocoa /path/to/repo --verbose
 ```
+
+If files modified/created only after a certain date are to be evaluated then use the date option:
+
+```bash
+cocoa /path/to/repo --date "YYYY-MM-DD"
+```
+
+Note: Please add date string in "YYYY-MM-DD" format.
+
+All options can be combined like so:
+
+```bash
+cocoa /path/to/repo --lint --verbose --date "YYYY-MM-DD"
+```
+
 
 ### Checks
 
