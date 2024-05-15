@@ -63,6 +63,21 @@ Results are truncated by default. To print all results, use the verbose option:
 cocoa /path/to/repo --verbose
 ```
 
+If files modified/created only after a certain date are to be evaluated then use the date option:
+
+```bash
+cocoa /path/to/repo --date "YYYY-MM-DD"
+```
+
+Note: Please add date string in "YYYY-MM-DD" format.
+
+All options can be combined like so:
+
+```bash
+cocoa /path/to/repo --lint --verbose --date "YYYY-MM-DD"
+```
+
+
 ### Checks
 
 The code run multiple checks on each repo. For each check run there are three possibilities:
