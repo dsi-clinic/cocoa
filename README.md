@@ -9,7 +9,7 @@ The goals of this codebase is to provide a quick and easy way to review code and
 
 ## Installation
 
-```pip install dsi-cocoa```
+`pip install dsi-cocoa`
 
 To install the package locally, run the following command from the root of the repository:
 ```bash
@@ -27,17 +27,20 @@ This package contains a module `evaluate_repo` which runs code testing libraries
 
 ### How to run
 
-Via command line: 
+Via command line:
+
 ```bash
 cocoa /path/to/repo
 ```
 
-As a python script: 
+As a python script:
+
 ```bash
 python3 src/cocoa/evaluate_repo.py /path/to/repo
 ```
 
 As a Python module:
+
 ```python
 from cocoa.evaluate_repo import evaluate_repo
 
@@ -51,6 +54,7 @@ A few important notes:
 1. This will only run the analysis (`pyflakes` on python files) for the code _in the current branch_. So if you run this while your current branch is `main` it will run on `main`.
 
 #### Options
+
 If you want to turn on linting, add the argument "--lint":
 
 ```bash
@@ -82,27 +86,26 @@ cocoa /path/to/repo --lint --verbose --date "YYYY-MM-DD"
 
 The code run multiple checks on each repo. For each check run there are three possibilities:
 
-1. WARNING: Most likely this needs to be fixed. 
+1. WARNING: Most likely this needs to be fixed.
 1. INFO: Log information for additional context.
 1. ERROR: A critical issue that needs to be addressed.
 
 For each of the checks below we have denoted what the check generates.
 
 - Branch Hygiene:
-    - [WARNING] Branch names 
-    - [INFO] Commit information for live branches.
+  - [WARNING] Branch names
+  - [INFO] Commit information for live branches.
 - File Hygiene:
-    - [ERROR] Unnecessary and cache file (such as .DS\_Store or pycache files)
-- Notebook Files (*.ipynb):
-    - [ERROR] Cells per notebook < 10, lines per cell < 15 and 0 functions defined
-    - [ERROR] Linting: PyLint, Black, Flake and iSort
+  - [ERROR] Unnecessary and cache file (such as .DS_Store or pycache files)
+- Notebook Files (\*.ipynb):
+  - [ERROR] Cells per notebook < 10, lines per cell < 15 and 0 functions defined
+  - [ERROR] Linting: PyLint, Black, Flake and iSort
 - Python Files
-    - [ERROR] All Code in Functions
-    - [ERROR] All functions have docstrings
-    - [ERROR] Code uses off-limit libraries (subprocess)
-    - [ERROR] Linting: PyLint, Black, Flake and iSort
-    
+  - [ERROR] All Code in Functions
+  - [ERROR] All functions have docstrings
+  - [ERROR] Code uses off-limit libraries (subprocess)
+  - [ERROR] Linting: PyLint, Black, Flake and iSort
+
 ### Github actions
 
 For each of the ERRORS and WARNINGS above there is an associated github action that can be run to create a badge which we put in a table at the top of each clinic repo.
-
