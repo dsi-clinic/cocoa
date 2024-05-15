@@ -29,7 +29,7 @@ jobs:
     - name: Run cocoa and check output
       id: cocoa_run
       run: |
-        if [ -z $DATE_PARAM ]; then
+        if [ -z "$DATE_PARAM" ]; then
           echo "Running DSI Standards check."
           output=$(cocoa . --lint --verbose)
         else
