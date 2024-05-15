@@ -35,7 +35,8 @@ jobs:
 
       - name: Bump minor version
         # haven't settip the cfg yet
-        run: bump2version minor --config-file .bumpversion.cfg
+        # run: bump2version minor --config-file .bumpversion.cfg
+        run: bump2version minor
 
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
