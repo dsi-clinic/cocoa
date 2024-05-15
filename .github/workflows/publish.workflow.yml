@@ -6,7 +6,8 @@ on:
   push:
     # trigger the workflow on push events to main branch
     branches:
-      - main
+      # - main
+      - publish-to-pypi
 
 jobs:
   build:
