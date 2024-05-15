@@ -63,11 +63,18 @@ Results are truncated by default. To print all results, use the verbose option:
 cocoa /path/to/repo --verbose
 ```
 
-To report remote branch information, use the `--branchinfo` option.
+If files modified/created only after a certain date are to be evaluated then use the date option:
 
-To run cocoa on files changed after a certain date, use the `--date` option with a date formatted as below.
 ```bash
-cocoa /path/to/repo --date YYYY-MM-DD
+cocoa /path/to/repo --date "YYYY-MM-DD"
+```
+
+Note: Please add date string in "YYYY-MM-DD" format.
+
+All options can be combined like so:
+
+```bash
+cocoa /path/to/repo --lint --verbose --date "YYYY-MM-DD"
 ```
 
 
