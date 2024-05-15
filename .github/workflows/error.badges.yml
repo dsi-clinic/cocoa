@@ -7,14 +7,6 @@ on:
       - ridhi-error-badge
 
 jobs:
-  display-variables:
-    runs-on: ubuntu-latest
-    environment:
-      name: cocoa_standards
-    steps:
-      - name: "Test environment variable"
-        run: echo "${{ vars.REVIEW_AFTER_DATE }}"
-
   cocoa_check:
     runs-on: ubuntu-latest
 
@@ -43,7 +35,7 @@ jobs:
           output=$(cocoa . --lint --verbose)
         else
           echo "Running DSI Standards check from date: ${{ vars.REVIEW_AFTER_DATE }}"
-          output=$(cocoa . --lint --verbose --date ${{ vars.REVIEW_AFTER_DATE }})
+          output=$(cocoa . --lint --verbose --date "${{ vars.REVIEW_AFTER_DATE }}")
         fi
     
         echo "$output"
