@@ -9,9 +9,7 @@ on:
 jobs:
   cocoa_check:
     runs-on: ubuntu-latest
-    env: 
-      DATE_PARAM: ${{ env.REVIEW_AFTER_DATE }}
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -29,6 +27,7 @@ jobs:
     - name: Run cocoa and check output
       id: cocoa_run
       run: |
+        echo "${{ cocoa_standards.REVIEW_AFTER_DATE }}"
         if [ -z "${{ env.REVIEW_AFTER_DATE }}" ]; then
           echo "Running DSI Standards check."
           output=$(cocoa . --lint --verbose)
