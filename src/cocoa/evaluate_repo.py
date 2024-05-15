@@ -36,7 +36,7 @@ from cocoa.repo import (
 
 
 def walk_and_process(
-    dir_path, no_filter_flag, lint_flag, start_date=None, verbose=False
+    dir_path, lint_flag, start_date=None, verbose=False
 ):
     """
     Walk through directory and process all python and jupyter notebook files.
@@ -61,12 +61,12 @@ def walk_and_process(
         if os.path.exists(file_path):
             if file_path.endswith(".ipynb") or file_path.endswith(".py"):
                 if file_path.endswith(".ipynb"):
-                    analyze_notebook(file_path, no_filter_flag, verbose)
+                    analyze_notebook(file_path, verbose)
                 elif file_path.endswith(".py"):
                     analyze_python_file(file_path, lint_flag, verbose)
 
 
-def analyze_notebook(file_path, no_filter_flag, verbose):
+def analyze_notebook(file_path, verbose):
     """Analyze a notebook"""
     num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(
         file_path
@@ -164,7 +164,6 @@ def evaluate_repo(
             get_remote_branches_info(path_or_url)
         walk_and_process(
             path_or_url,
-            None,
             lint_flag=lint_flag,
             start_date=start_date,
             verbose=verbose,
