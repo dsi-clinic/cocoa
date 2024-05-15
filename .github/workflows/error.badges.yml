@@ -1,0 +1,53 @@
+name: Cocoa Error Analysis
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  cocoa_check:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: cocoa_standards
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'  
+
+    - name: Install cocoa
+      run: pip3 install dsi-cocoa  
+
+    - name: Run cocoa and check output
+      id: cocoa_run
+      run: |
+        if [ -z "${{ vars.REVIEW_AFTER_DATE }}" ]; then
+          echo "Running DSI Standards check."
+          output=$(cocoa . --lint --verbose)
+        else
+          echo "Running DSI Standards check from date: ${{ vars.REVIEW_AFTER_DATE }}"
+          output=$(cocoa . --lint --verbose --date "${{ vars.REVIEW_AFTER_DATE }}")
+        fi
+    
+        echo "$output"
+
+        if echo "$output" | grep -iq 'Warning'; then
+          echo "Warning detected."
+        fi
+
+        if echo "$output" | grep -iq 'Error'; then
+          echo "Error detected."
+          exit 1  
+        fi
+      shell: bash
+
+    - name: Success
+      run: echo "No critical issues found"
