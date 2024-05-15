@@ -1,3 +1,5 @@
+update readme for testing
+
 # Clinic Opinionated Codebase Oversight and Analysis
 
 This repository was developed in order to generate automated reports on how well codebases adhere to the [coding standards](https://github.com/dsi-clinic/coding-standards) of the University of Chicago's DSI [Clinic course](https://datascience.uchicago.edu/education/data-science-clinic/).
