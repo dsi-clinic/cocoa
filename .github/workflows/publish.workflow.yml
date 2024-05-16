@@ -30,8 +30,8 @@ jobs:
 
       - name: Set up Git identity
         run: |
-          git config --global user.name "chenhuifei01"
-          git config --global user.email "chenhui1@uchicago.edu"
+          git config --global user.name "DSI-Cocoa"
+          git config --global user.email "no-email@uchicago.edu"
 
       - name: Bump minor version
         # haven't settip the cfg yet
