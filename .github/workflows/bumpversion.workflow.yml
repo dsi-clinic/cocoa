@@ -6,8 +6,8 @@ on:
       - test
 
 jobs:
-  build:
-    name: Build distribution
+  bump:
+    name: Bump version
     runs-on: ubuntu-latest
 
     steps:
@@ -33,5 +33,5 @@ jobs:
         run: bump2version patch
 
       - name: Push
-        run: git push
+        run: git push --tags
           
