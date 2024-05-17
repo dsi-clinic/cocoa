@@ -33,5 +33,7 @@ jobs:
         run: bump2version patch
 
       - name: Push
-        run: git push --tags
+        run:  |
+          git push
+          git push --tags
           
