@@ -24,11 +24,11 @@ jobs:
           build bump2version
           --user
 
+      - name: Bump minor version
+        run: bump2version patch
+
       - name: Set up Git identity
         run: |
           git config --global user.name "chenhuifei01"
           git config --global user.email "chenhui1@uchicago.edu"
-
-      - name: Bump minor version
-        run: bump2version patch
-
+          git push
