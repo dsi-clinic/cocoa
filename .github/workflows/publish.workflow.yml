@@ -1,15 +1,42 @@
-name: Publish Python Distribution to PyPI
-# adapted from
-# https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+name: Test bump2version
 
 on:
   push:
-    # trigger the workflow on push events to main branch
     branches:
-      # - main
-      - publish-to-pypi
+      - test
 
 jobs:
+  bump:
+    name: Bump version
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install pypa/build
+        run: >-
+          python3 -m
+          pip install
+          bump2version
+          --user
+
+      - name: Set up Git identity
+        run: |
+          git config --global user.name "testuser"
+          git config --global user.email "testuser@uchicago.edu"
+
+      - name: Bump patch version
+        run: bump2version patch
+
+      - name: Push
+        run:  |
+          git push
+          git push --tags
+
   build:
     name: Build distribution
     runs-on: ubuntu-latest
@@ -25,18 +52,8 @@ jobs:
         run: >-
           python3 -m
           pip install
-          build bump2version
+          build
           --user
-
-      - name: Set up Git identity
-        run: |
-          git config --global user.name "chenhuifei01"
-          git config --global user.email "chenhui1@uchicago.edu"
-
-      - name: Bump minor version
-        # haven't settip the cfg yet
-        # run: bump2version minor --config-file .bumpversion.cfg
-        run: bump2version minor
 
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
