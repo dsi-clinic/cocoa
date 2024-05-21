@@ -4,13 +4,44 @@ name: Publish Python Distribution to PyPI on tag push
 
 on:
   push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-# publish when a new tag is pushed with semantic version
+    branches:
+      - test
 
 jobs:
+  bump:
+    name: Bump version
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install bump2version
+        run: >-
+          python3 -m
+          pip install
+          bump2version
+          --user
+
+      - name: Set up Git identity
+        run: |
+          git config --global user.name "testuser"
+          git config --global user.email "testuser@uchicago.edu"
+
+      - name: Bump patch version
+        run: bump2version patch
+
+      - name: Push
+        run:  |
+          git push
+          git push --tags
   build:
     name: Build distribution
+    needs:
+      - bump
     runs-on: ubuntu-latest
 
     steps:
