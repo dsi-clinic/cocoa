@@ -1,42 +1,14 @@
-name: Test bump2version
+name: Publish Python Distribution to PyPI on tag push
+# adapted from
+# https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
 
 on:
   push:
-    branches:
-      - test
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+# publish when a new tag is pushed with semantic version
 
 jobs:
-  bump:
-    name: Bump version
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-
-      - name: Install pypa/build
-        run: >-
-          python3 -m
-          pip install
-          bump2version
-          --user
-
-      - name: Set up Git identity
-        run: |
-          git config --global user.name "testuser"
-          git config --global user.email "testuser@uchicago.edu"
-
-      - name: Bump patch version
-        run: bump2version patch
-
-      - name: Push
-        run:  |
-          git push
-          git push --tags
-
   build:
     name: Build distribution
     runs-on: ubuntu-latest
@@ -47,23 +19,19 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
-
       - name: Install pypa/build
         run: >-
           python3 -m
           pip install
           build
           --user
-
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
-
       - name: Store the distribution packages
         uses: actions/upload-artifact@v3
         with:
           name: python-package-distributions
           path: dist/
-
   publish-to-pypi:
     name: PublishPython distribution to PyPI
     needs:
@@ -74,7 +42,7 @@ jobs:
       url: https://pypi.org/p/dsi-cocoa
     permissions:
       id-token: write
-
+    
     steps:
       - name: Download all the dists
         uses: actions/download-artifact@v3
