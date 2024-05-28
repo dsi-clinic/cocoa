@@ -201,3 +201,22 @@ def is_git_remote_repo(url):
         print(f"Failed to access {url}: {e}")
 
     return False
+
+
+def switch_branches(repo_path, target_branch):
+    """Switch branches in a repository"""
+    repo = git.Repo(repo_path)
+    # Fetch all branches from remote
+    repo.git.fetch()
+
+    # Check if the target branch exists locally or remotely
+    if target_branch in repo.heads:
+        # Checkout the local branch
+        repo.git.checkout(target_branch)
+        print(f"Switched to local branch: {target_branch}")
+    elif target_branch in repo.remotes.origin.refs:
+        # Checkout the remote branch
+        repo.git.checkout("-b", target_branch, f"origin/{target_branch}")
+        print(f"Switched to remote branch: {target_branch}")
+    else:
+        print(f"Branch '{target_branch}' does not exist locally or remotely.")
