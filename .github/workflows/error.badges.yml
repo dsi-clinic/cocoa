@@ -3,7 +3,7 @@ name: Cocoa Error Analysis
 on:
   push:
     branches:
-      - main
+      - thannifan/error-workflow'
 
 jobs:
   cocoa_check:
