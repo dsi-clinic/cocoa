@@ -3,7 +3,7 @@ name: Cocoa Error Analysis
 on:
   push:
     branches:
-      - main
+      - thannifan/error-workflow
 
 jobs:
   cocoa_check:
@@ -29,14 +29,19 @@ jobs:
     - name: Run cocoa and check output
       id: cocoa_run
       run: |
-        if [ -z "${{ vars.REVIEW_AFTER_DATE }}" ]; then
-          echo "Running DSI Standards check."
-          output=$(cocoa . --lint --verbose)
-        else
-          echo "Running DSI Standards check from date: ${{ vars.REVIEW_AFTER_DATE }}"
-          output=$(cocoa . --lint --verbose --date "${{ vars.REVIEW_AFTER_DATE }}")
+        run_string="cocoa . --lint --verbose "
+
+        if [ ! -z "${{ vars.REVIEW_AFTER_DATE }}" ]; then
+            echo "Running cocoa from date: ${{ vars.REVIEW_AFTER_DATE }}"
+            run_string+="--date ${{ vars.REVIEW_AFTER_DATE }} "    
         fi
-    
+
+        if [ ! -z "${{ vars.BRANCH_NAME }}" ]; then
+            echo "Running cocoa on branch: ${{ vars.BRANCH_NAME }}"
+            run_string+="--branch ${{ vars.BRANCH_NAME }} "    
+        fi
+
+        output=$($run_string)
         echo "$output"
 
         if echo "$output" | grep -iq 'Warning'; then
