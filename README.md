@@ -67,18 +67,25 @@ Results are truncated by default. To print all results, use the verbose option:
 cocoa /path/to/repo --verbose
 ```
 
+Cocoa evaluates the main branch by default. To evaluate a different branch, use the branch argument:
+
+```bash
+cocoa /path/to/repo --branch branch-name
+```
+
+
 If files modified/created only after a certain date are to be evaluated then use the date option:
 
 ```bash
-cocoa /path/to/repo --date "YYYY-MM-DD"
+cocoa /path/to/repo --date YYYY-MM-DD
 ```
 
-Note: Please add date string in "YYYY-MM-DD" format.
+Note: Please add date string in YYYY-MM-DD format.
 
 All options can be combined like so:
 
 ```bash
-cocoa /path/to/repo --lint --verbose --date "YYYY-MM-DD"
+cocoa /path/to/repo --lint --verbose --date YYYY-MM-DD
 ```
 
 
@@ -108,4 +115,6 @@ For each of the checks below we have denoted what the check generates.
 
 ### Github actions
 
-For each of the ERRORS and WARNINGS above there is an associated github action that can be run to create a badge which we put in a table at the top of each clinic repo.
+There is a Github action located [here](.github/workflows/error.badges.yml) that runs `cocoa` on pushes to the main branch. The action has an associated badge that can be displayed at the top of your repo to show passing or failing status. The badge code can be copied from the raw text of this readme.
+
+To override the `--date` or `--branch` options run in the action, create an environment named "cocoa_standards" in your repository, then create environment variables called `BRANCH_NAME` and `REVIEW_AFTER_DATE`.
