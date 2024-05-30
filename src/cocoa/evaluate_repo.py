@@ -32,12 +32,11 @@ from cocoa.repo import (
     get_remote_branches_info,
     is_git_remote_repo,
     is_git_repo,
+    switch_branches,
 )
 
 
-def walk_and_process(
-    dir_path, lint_flag, start_date=None, verbose=False
-):
+def walk_and_process(dir_path, lint_flag, start_date=None, verbose=False):
     """
     Walk through directory and process all python and jupyter notebook files.
     """
@@ -148,7 +147,12 @@ def print_results(tool_name, results, verbose=False):
 
 
 def evaluate_repo(
-    path_or_url, lint_flag, start_date=None, verbose=False, branchinfo=False
+    path_or_url,
+    lint_flag,
+    start_date=None,
+    verbose=False,
+    branchinfo=False,
+    branch_name="main",
 ):
     """
     This is the entry point to running the automated code review.
@@ -158,6 +162,8 @@ def evaluate_repo(
         if not is_git_repo(path_or_url):
             print(f"Error: {path_or_url} is not a Git repository.")
             exit(1)
+
+        switch_branches(path_or_url, branch_name)
 
         check_branch_names(path_or_url)
         if branchinfo:
@@ -202,7 +208,12 @@ def main():
     parser.add_argument(
         "--branchinfo", help="Report branch information", action="store_true"
     )
-
+    parser.add_argument(
+        "--branch",
+        default="main",
+        help="Specify which branch to evaluate",
+        type=str,
+    )
     args = parser.parse_args()
 
     dir_path = args.repo
@@ -210,8 +221,9 @@ def main():
     start_date = args.date
     verbose = args.verbose
     branchinfo = args.branchinfo
+    branch = args.branch
 
-    evaluate_repo(dir_path, lint_flag, start_date, verbose, branchinfo)
+    evaluate_repo(dir_path, lint_flag, start_date, verbose, branchinfo, branch)
 
 
 if __name__ == "__main__":

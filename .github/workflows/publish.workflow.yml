@@ -4,10 +4,9 @@ name: Publish Python Distribution to PyPI
 
 on:
   push:
-    # trigger the workflow on push events to main branch
-    branches:
-      # - main
-      - publish-to-pypi
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+# publish when a new tag is pushed with semantic version
 
 jobs:
   build:
@@ -20,33 +19,19 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
-
       - name: Install pypa/build
         run: >-
           python3 -m
           pip install
-          build bump2version
+          build
           --user
-
-      - name: Set up Git identity
-        run: |
-          git config --global user.name "chenhuifei01"
-          git config --global user.email "chenhui1@uchicago.edu"
-
-      - name: Bump minor version
-        # haven't settip the cfg yet
-        # run: bump2version minor --config-file .bumpversion.cfg
-        run: bump2version minor
-
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
-
       - name: Store the distribution packages
         uses: actions/upload-artifact@v3
         with:
           name: python-package-distributions
           path: dist/
-
   publish-to-pypi:
     name: PublishPython distribution to PyPI
     needs:
@@ -57,7 +42,7 @@ jobs:
       url: https://pypi.org/p/dsi-cocoa
     permissions:
       id-token: write
-
+    
     steps:
       - name: Download all the dists
         uses: actions/download-artifact@v3
