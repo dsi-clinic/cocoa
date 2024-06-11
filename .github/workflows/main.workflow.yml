@@ -3,10 +3,12 @@ name: Development Checks
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
-  pull_request:
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - dev
+  push:
     branches:
-      - main
-      - dev
       - thannifan/pre-commit
 
 jobs:
