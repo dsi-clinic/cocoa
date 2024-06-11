@@ -1,6 +1,4 @@
-"""
-Utilities for evaluating the status and structure of a git repository
-"""
+"""Utilities for evaluating the status and structure of a git repository"""
 
 import os
 import tempfile
@@ -12,9 +10,7 @@ from git import GitCommandError, Repo
 
 
 def is_git_repo(repo_path):
-    """
-    Return a boolean if the directory supplied is a git repo.
-    """
+    """Return a boolean if the directory supplied is a git repo."""
     try:
         return git.Repo(repo_path).git_dir is not None
     except git.InvalidGitRepositoryError:
@@ -22,8 +18,7 @@ def is_git_repo(repo_path):
 
 
 def get_remote_branches_info(repo_path, display=True):
-    """
-    This function returns the branch information from the
+    """This function returns the branch information from the
     remote repository.
     """
     repo = git.Repo(repo_path)
@@ -53,8 +48,7 @@ def get_remote_branches_info(repo_path, display=True):
 
 
 def get_current_branch(repo_path):
-    """
-    Get the name of the current branch in a Git repository.
+    """Get the name of the current branch in a Git repository.
 
     Parameters:
         repo_path (str): The path to the Git repository.
@@ -83,8 +77,7 @@ def get_current_branch(repo_path):
 
 
 def clone_repo(repo_url, dir_name=None):
-    """
-    Clones a Git repository into a specified directory or a temporary directory if
+    """Clones a Git repository into a specified directory or a temporary directory if
     no directory is specified.
 
     Parameters:
@@ -114,9 +107,7 @@ def clone_repo(repo_url, dir_name=None):
 
         # update but not clone if the dir existed
         if os.path.exists(repo_path):
-            print(
-                f"The directory {repo_path} already exists. Fetching changes."
-            )
+            print(f"The directory {repo_path} already exists. Fetching changes.")
             repo = Repo(repo_path)
             repo.remote().fetch()
         else:
@@ -136,8 +127,7 @@ def clone_repo(repo_url, dir_name=None):
 
 
 def check_branch_names(repo_path):
-    """
-    Check for branches other than 'main' and 'dev' in the repository.
+    """Check for branches other than 'main' and 'dev' in the repository.
 
     Args:
         repo_path (str): The path to the repository.
@@ -163,8 +153,7 @@ def check_branch_names(repo_path):
 
 
 def files_after_date(repo_path, start_date):
-    """
-    Returns a list of files that have been committed after
+    """Returns a list of files that have been committed after
     a specified start date.
 
     Args:

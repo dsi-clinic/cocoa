@@ -1,4 +1,4 @@
-""""
+""" "
 Utility Functions for evaluating the status and structure of python code
 """
 
@@ -16,9 +16,7 @@ from pylint.lint import Run
 from pylint.reporters.text import TextReporter
 
 
-def convert_temp_names_to_originals(
-    errors_and_warnings: list, original_path: str
-):
+def convert_temp_names_to_originals(errors_and_warnings: list, original_path: str):
     """In a list of errors ["<path>: <error>"], converts path to original_path
 
     When Jupyter Notebooks are converted to python temp files and run throughj
@@ -39,8 +37,7 @@ def convert_temp_names_to_originals(
 
 
 def pyflakes_notebook(path_to_notebook):
-    """
-    Run pyflakes on a Jupyter notebook.
+    """Run pyflakes on a Jupyter notebook.
     :param path_to_notebook: path to the notebook file.
     :return: list of warnings and errors from pyflakes.
     """
@@ -49,9 +46,7 @@ def pyflakes_notebook(path_to_notebook):
         exporter = PythonExporter()
         script, _ = exporter.from_filename(path_to_notebook)
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", delete=False, suffix=".py"
-        ) as temp:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".py") as temp:
             temp_name = temp.name
             temp.write(script)
 
@@ -69,9 +64,7 @@ def pyflakes_notebook(path_to_notebook):
 
 
 def pyflakes_python_file(file_path):
-    """
-    Run a python file through pyflakes. returns the number of warnings raised.
-    """
+    """Run a python file through pyflakes. returns the number of warnings raised."""
     # Prepare StringIO object for capturing pyflakes output
     error_stream = StringIO()
     warning_stream = StringIO()
@@ -96,8 +89,7 @@ def pyflakes_python_file(file_path):
 
 
 def get_pylint_warnings(filepath):
-    """
-    Run pylint on the specified file and return warnings,
+    """Run pylint on the specified file and return warnings,
     ignoring specific error codes.
     """
     # Define the error codes to ignore
@@ -128,13 +120,12 @@ def get_pylint_warnings(filepath):
 
 
 def black_python_file(file_path):
-    """
-    Runs black on a python file. Returns a list of diffs from
+    """Runs black on a python file. Returns a list of diffs from
     the original file.
     """
     try:
         # Read the content of the file
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         # Use Black's API to format the code
@@ -165,8 +156,7 @@ def black_python_file(file_path):
 
 
 def is_code_in_functions_or_main(file_path):
-    """
-    Check if all code in the given Python script is within functions or the main block.
+    """Check if all code in the given Python script is within functions or the main block.
 
     Args:
         file_path (str): The path to the Python script.
@@ -174,9 +164,8 @@ def is_code_in_functions_or_main(file_path):
     Returns:
         bool: True if all code is within functions or main block, False otherwise.
     """
-
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(file_path, encoding="utf-8") as file:
             tree = ast.parse(file.read(), filename=file_path)
 
         # Assume code is properly encapsulated until found otherwise
@@ -190,9 +179,7 @@ def is_code_in_functions_or_main(file_path):
 
             # Check for function or class definitions, main block, and module docstrings
             if not (
-                isinstance(
-                    node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
-                )
+                isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
                 or (
                     isinstance(node, ast.If)
                     and isinstance(node.test, ast.Compare)
@@ -216,8 +203,7 @@ def is_code_in_functions_or_main(file_path):
 
 
 def functions_without_docstrings(file_path):
-    """
-    Identify all functions in a given Python file that do not have docstrings.
+    """Identify all functions in a given Python file that do not have docstrings.
 
     Args:
         file_path (str): Path to the Python script.
@@ -225,9 +211,8 @@ def functions_without_docstrings(file_path):
     Returns:
         list: A list of names of functions that do not have docstrings.
     """
-
     try:
-        with open(file_path, "r", encoding="utf-8") as source:
+        with open(file_path, encoding="utf-8") as source:
             tree = ast.parse(source.read(), filename=file_path)
 
         no_docstrings = []
@@ -242,7 +227,7 @@ def functions_without_docstrings(file_path):
                 ):
                     no_docstrings.append(node.name)
         return no_docstrings
-    except IOError as e:
+    except OSError as e:
         print(f"Error opening or reading the file: {e}")
         return []
 
@@ -264,8 +249,7 @@ class SubprocessVisitor(ast.NodeVisitor):
 
 
 def code_contains_subprocess(filepath):
-    """
-    Check if code uses subprocess.
+    """Check if code uses subprocess.
 
     Args:
         file_path (str): The path to the Python script.
@@ -274,7 +258,7 @@ def code_contains_subprocess(filepath):
         bool: True if code contains subprocess, False otherwise.
     """
     try:
-        with open(filepath, "r") as file:
+        with open(filepath) as file:
             # Read the content of the file
             file_content = file.read()
             # Parse the content into an AST
@@ -283,6 +267,6 @@ def code_contains_subprocess(filepath):
             visitor = SubprocessVisitor()
             visitor.visit(tree)
             return visitor.found
-    except IOError as e:
+    except OSError as e:
         print(f"Error opening or reading the file: {e}")
         return False

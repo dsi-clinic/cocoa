@@ -3,8 +3,7 @@ from repo import clone_repo
 
 
 def process_repos(repo_urls):
-    """
-    Processes a list of Git repository URLs by cloning each repository, evaluating it,
+    """Processes a list of Git repository URLs by cloning each repository, evaluating it,
     and collecting the results. Each repository is cloned using the `clone_repo`
     function, and then evaluated by calling the `evaluate_repo` function.
 

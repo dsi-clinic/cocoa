@@ -1,6 +1,4 @@
-"""
-Main entry point for complete evaluation of a python codebase in git
-"""
+"""Main entry point for evaluating a repo"""
 
 import argparse
 import os
@@ -37,9 +35,7 @@ from cocoa.repo import (
 
 
 def walk_and_process(dir_path, lint_flag, start_date=None, verbose=False):
-    """
-    Walk through directory and process all python and jupyter notebook files.
-    """
+    """Walk through directory and process all python and jupyter notebook files."""
     paths_to_flag = ["__pycache__", "DS_Store", "ipynb_checkpoints"]
     cprint(
         f"Currently analyzing branch {get_current_branch(dir_path)}",
@@ -67,9 +63,7 @@ def walk_and_process(dir_path, lint_flag, start_date=None, verbose=False):
 
 def analyze_notebook(file_path, verbose):
     """Analyze a notebook"""
-    num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(
-        file_path
-    )
+    num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(file_path)
     pyflake_results = pyflakes_notebook(file_path)
 
     if (
@@ -85,9 +79,7 @@ def analyze_notebook(file_path, verbose):
         if num_cells > MAX_CELLS_PER_NOTEBOOK:
             print(f"\tMax number of cells exceeded: {num_cells}")
         if max_lines_in_cell > MAX_LINES_PER_CELL:
-            print(
-                f"\tMax number of lines per cell exceeded: {max_lines_in_cell}"
-            )
+            print(f"\tMax number of lines per cell exceeded: {max_lines_in_cell}")
         if num_functions > MAX_FUNCTIONS_PER_NOTEBOOK:
             print(f"\tFunction definitions detected: {num_functions}")
 
@@ -154,9 +146,7 @@ def evaluate_repo(
     branchinfo=False,
     branch_name="main",
 ):
-    """
-    This is the entry point to running the automated code review.
-    """
+    """This is the entry point to running the automated code review."""
     cprint(PREAMBLE_TEXT, color="green")
     if os.path.isdir(path_or_url):
         if not is_git_repo(path_or_url):
@@ -184,9 +174,7 @@ def evaluate_repo(
         )
         shutil.rmtree(repo_path)
     else:
-        print(
-            f"Error: {path_or_url} is either private or not a git repository. 404."
-        )
+        print(f"Error: {path_or_url} is either private or not a git repository. 404.")
         exit(1)
     return 0
 
@@ -196,9 +184,7 @@ def main():
 
     parser.add_argument("repo", help="Path to a repository root directory")
     parser.add_argument("--lint", help="Run linting", action="store_true")
-    parser.add_argument(
-        "--verbose", help="Print all results", action="store_true"
-    )
+    parser.add_argument("--verbose", help="Print all results", action="store_true")
     parser.add_argument(
         "--date",
         default=None,

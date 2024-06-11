@@ -2,6 +2,7 @@
 
 [![Cocoa Error Analysis](https://github.com/dsi-clinic/cocoa/actions/workflows/error.badges.yml/badge.svg)](https://github.com/dsi-clinic/cocoa/actions/workflows/error.badges.yml)
 
+[![Pre-commit](https://github.com/dsi-clinic/cocoa/actions/workflows/main.workflow.yml/badge.svg)](https://github.com/dsi-clinic/cocoa/actions/workflows/main.workflow.yml)
 
 This repository was developed in order to generate automated reports on how well codebases adhere to the [coding standards](https://github.com/dsi-clinic/coding-standards) of the University of Chicago's DSI [Clinic course](https://datascience.uchicago.edu/education/data-science-clinic/).
 
