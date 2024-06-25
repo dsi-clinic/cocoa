@@ -1,10 +1,9 @@
-""" "
-Utility Functions for evaluating the status and structure of python code
-"""
+"""Utility Functions for evaluating the status and structure of python code"""
 
 import ast
 import difflib
 import os
+import subprocess
 import tempfile
 from io import StringIO
 
@@ -15,6 +14,18 @@ from pyflakes.reporter import Reporter
 from pylint.lint import Run
 from pylint.reporters.text import TextReporter
 
+
+def run_ruff_and_capture_output(path) -> str:
+    try:
+        # Run the ruff command
+        result = subprocess.run(['ruff', 'check', path], capture_output=True, text=True)
+        
+        # Combine stdout and stderr
+        output = result.stdout + result.stderr
+        
+        return output
+    except Exception as e:
+        return str(e)
 
 def convert_temp_names_to_originals(errors_and_warnings: list, original_path: str):
     """In a list of errors ["<path>: <error>"], converts path to original_path

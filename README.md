@@ -56,12 +56,6 @@ A few important notes:
 
 #### Options
 
-If you want to turn on linting, add the argument "--lint":
-
-```bash
-cocoa /path/to/repo --lint
-```
-
 Results are truncated by default. To print all results, use the verbose option:
 
 ```bash
