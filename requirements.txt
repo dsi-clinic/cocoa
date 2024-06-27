@@ -1,3 +1,9 @@
+# development tools
+ruff
+pre-commit~=3.5
+setuptools>=64.0.0
+
+# project packages
 GitPython==3.1.32
 pyflakes
 pylint
@@ -7,5 +13,4 @@ termcolor==2.3.0
 flake8~=6.1
 flake8-bugbear~=23.11
 black~=22.11
-pre-commit~=3.5
 requests

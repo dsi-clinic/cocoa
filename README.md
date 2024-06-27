@@ -2,6 +2,7 @@
 
 [![Cocoa Error Analysis](https://github.com/dsi-clinic/cocoa/actions/workflows/error.badges.yml/badge.svg)](https://github.com/dsi-clinic/cocoa/actions/workflows/error.badges.yml)
 
+[![Pre-commit](https://github.com/dsi-clinic/cocoa/actions/workflows/main.workflow.yml/badge.svg)](https://github.com/dsi-clinic/cocoa/actions/workflows/main.workflow.yml)
 
 This repository was developed in order to generate automated reports on how well codebases adhere to the [coding standards](https://github.com/dsi-clinic/coding-standards) of the University of Chicago's DSI [Clinic course](https://datascience.uchicago.edu/education/data-science-clinic/).
 
@@ -54,12 +55,6 @@ A few important notes:
 1. This will only run the analysis (`pyflakes` on python files) for the code _in the current branch_. So if you run this while your current branch is `main` it will run on `main`.
 
 #### Options
-
-If you want to turn on linting, add the argument "--lint":
-
-```bash
-cocoa /path/to/repo --lint
-```
 
 Results are truncated by default. To print all results, use the verbose option:
 
