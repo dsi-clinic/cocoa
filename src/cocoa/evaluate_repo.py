@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import re
 import shutil
 
 from termcolor import cprint
@@ -28,7 +29,6 @@ from cocoa.repo import (
     is_git_repo,
     switch_branches,
 )
-
 
 
 def walk_and_process(dir_path, start_date=None, verbose=False) -> None:
@@ -58,22 +58,39 @@ def walk_and_process(dir_path, start_date=None, verbose=False) -> None:
                     analyze_python_file(file_path, verbose)
 
 
-def analyze_notebook(file_path, verbose):
+def find_first_match_index(lst, pattern):
+    regex = re.compile(pattern)
+    for index, item in enumerate(lst):
+        if regex.match(item):
+            return index
+    return -1  # Return -1 if no match is found
+
+def process_ruff_results(results: list) -> list:
+    """Process ruff results into a list of errors."""
+    results = results.split('\n')
+    fmi  = find_first_match_index(results, r'Found \d+ errors')
+
+    if fmi == -1:
+        return []
+    return results[:fmi]
+
+
+def analyze_notebook(file_path, verbose) -> None:
     """Analyze a notebook"""
     num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(file_path)
 
     ruff_results = run_ruff_and_capture_output(file_path)
-    ruff_results = ruff_results.split('\n')
+    ruff_results = process_ruff_results(ruff_results)
 
     if (
-        len(ruff_results) > 2
+        len(ruff_results) > 0
         or num_cells > MAX_CELLS_PER_NOTEBOOK
         or max_lines_in_cell > MAX_LINES_PER_CELL
         or num_functions > MAX_FUNCTIONS_PER_NOTEBOOK
     ):
         print(f"Analyzing {file_path}:")
-        if len(ruff_results) > 2:
-            print_results("ruff", ruff_results[:-3], verbose=verbose)
+        if len(ruff_results) > 0:
+            print_results("ruff", ruff_results, verbose=verbose)
 
         if num_cells > MAX_CELLS_PER_NOTEBOOK:
             print(f"\tMax number of cells exceeded: {num_cells}")
@@ -85,22 +102,23 @@ def analyze_notebook(file_path, verbose):
         print("-" * 80)
 
 
-def analyze_python_file(file_path, verbose):
+def analyze_python_file(file_path, verbose) -> None:
     """Analyze a Python file"""
     contains_subprocess = code_contains_subprocess(file_path)
     code_in_functions = is_code_in_functions_or_main(file_path)
     ruff_results = run_ruff_and_capture_output(file_path)
-    ruff_results = ruff_results.split('\n')
+    ruff_results = process_ruff_results(ruff_results)
   
     if (
         contains_subprocess
-        or (len(ruff_results) > 2)
+        or len(ruff_results) > 0
         or not code_in_functions
     ):
         print(f"Analyzing {file_path}:")
 
-        if len(ruff_results) > 2:
-            print_results("ruff", ruff_results[:-3], verbose=verbose)
+        if len(ruff_results) > 0:
+            # print(ruff_results)
+            print_results("ruff", ruff_results, verbose=verbose)
 
         if contains_subprocess:
             print("\tSubprocess usage detected.")
@@ -109,7 +127,7 @@ def analyze_python_file(file_path, verbose):
         print("-" * 80)
 
 
-def print_results(tool_name, results, verbose=False):
+def print_results(tool_name, results, verbose=False) -> None:
     """Print results from pylint or pyflake"""
     if results:
         if verbose:
@@ -121,7 +139,7 @@ def print_results(tool_name, results, verbose=False):
             for result in results[:5]:
                 print(f"\t  {result}")
             if len(results) > 5:
-                print(f"\t  ...and {len(results) - 5} more issues.")
+                print(f"\t  ...plus {len(results) - 5} more. To see more details, use the --verbose flag.")
 
 
 def evaluate_repo(
@@ -130,7 +148,7 @@ def evaluate_repo(
     verbose=False,
     branchinfo=False,
     branch_name="main",
-):
+) -> None:
     """This is the entry point to running the automated code review."""
     cprint(PREAMBLE_TEXT, color="green")
     if os.path.isdir(path_or_url):
