@@ -37,6 +37,8 @@ cocoa = "cocoa.evaluate_repo:main"
 [tool.setuptools.packages.find]
 where = ["src"]  
 
+[tool.setuptools_scm]
+
 [tool.ruff.lint]
 extend-select = [
   # by default, ruff enables all F and a subset of E rules
