@@ -16,6 +16,7 @@ from cocoa.linting import (
     code_contains_subprocess,
     is_code_in_functions_or_main,
     process_ruff_results,
+    reformat_with_ruff,
     run_ruff_and_capture_output,
 )
 from cocoa.notebooks import process_notebook
@@ -91,12 +92,8 @@ def analyze_python_file(file_path, verbose) -> None:
     code_in_functions = is_code_in_functions_or_main(file_path)
     ruff_results = run_ruff_and_capture_output(file_path)
     ruff_results = process_ruff_results(ruff_results)
-  
-    if (
-        contains_subprocess
-        or len(ruff_results) > 0
-        or not code_in_functions
-    ):
+
+    if contains_subprocess or len(ruff_results) > 0 or not code_in_functions:
         print(f"Analyzing {file_path}:")
 
         if len(ruff_results) > 0:
@@ -121,7 +118,9 @@ def print_results(tool_name, results, verbose=False) -> None:
             for result in results[:5]:
                 print(f"\t  {result}")
             if len(results) > 5:
-                print(f"\t  ...plus {len(results) - 5} more. To see more details, use the --verbose flag.")
+                print(
+                    f"\t  ...plus {len(results) - 5} more. To see more details, use the --verbose flag."
+                )
 
 
 def evaluate_repo(
@@ -149,6 +148,9 @@ def evaluate_repo(
             start_date=start_date,
             verbose=verbose,
         )
+
+        reformat_with_ruff(path_or_url)
+
     elif is_git_remote_repo(path_or_url):
         repo_path = clone_repo(path_or_url)
         evaluate_repo(
