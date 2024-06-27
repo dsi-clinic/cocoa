@@ -3,6 +3,7 @@
 import ast
 import difflib
 import os
+import re
 import subprocess
 import tempfile
 from io import StringIO
@@ -26,6 +27,25 @@ def run_ruff_and_capture_output(path) -> str:
         return output
     except Exception as e:
         return str(e)
+
+
+def find_first_match_index(lst, pattern):
+    regex = re.compile(pattern)
+    for index, item in enumerate(lst):
+        if regex.match(item):
+            return index
+    return -1  # Return -1 if no match is found
+
+
+def process_ruff_results(results: list) -> list:
+    """Process ruff results into a list of errors."""
+    results = results.split('\n')
+    fmi  = find_first_match_index(results, r'Found \d+ errors')
+
+    if fmi == -1:
+        return []
+    return results[:fmi]
+
 
 def convert_temp_names_to_originals(errors_and_warnings: list, original_path: str):
     """In a list of errors ["<path>: <error>"], converts path to original_path

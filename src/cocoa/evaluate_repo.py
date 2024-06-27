@@ -2,7 +2,6 @@
 
 import argparse
 import os
-import re
 import shutil
 
 from termcolor import cprint
@@ -16,6 +15,7 @@ from cocoa.constants import (
 from cocoa.linting import (
     code_contains_subprocess,
     is_code_in_functions_or_main,
+    process_ruff_results,
     run_ruff_and_capture_output,
 )
 from cocoa.notebooks import process_notebook
@@ -56,23 +56,6 @@ def walk_and_process(dir_path, start_date=None, verbose=False) -> None:
                     analyze_notebook(file_path, verbose)
                 elif file_path.endswith(".py"):
                     analyze_python_file(file_path, verbose)
-
-
-def find_first_match_index(lst, pattern):
-    regex = re.compile(pattern)
-    for index, item in enumerate(lst):
-        if regex.match(item):
-            return index
-    return -1  # Return -1 if no match is found
-
-def process_ruff_results(results: list) -> list:
-    """Process ruff results into a list of errors."""
-    results = results.split('\n')
-    fmi  = find_first_match_index(results, r'Found \d+ errors')
-
-    if fmi == -1:
-        return []
-    return results[:fmi]
 
 
 def analyze_notebook(file_path, verbose) -> None:
@@ -117,7 +100,6 @@ def analyze_python_file(file_path, verbose) -> None:
         print(f"Analyzing {file_path}:")
 
         if len(ruff_results) > 0:
-            # print(ruff_results)
             print_results("ruff", ruff_results, verbose=verbose)
 
         if contains_subprocess:
