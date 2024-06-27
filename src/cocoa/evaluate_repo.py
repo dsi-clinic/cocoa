@@ -3,6 +3,7 @@
 import argparse
 import os
 import shutil
+from pathlib import Path
 
 from termcolor import cprint
 
@@ -32,7 +33,9 @@ from cocoa.repo import (
 )
 
 
-def walk_and_process(dir_path, start_date=None, verbose=False) -> None:
+def walk_and_process(
+    dir_path: str, start_date: str = None, verbose: bool = False
+) -> None:
     """Walk through directory and process all python and jupyter notebook files."""
     paths_to_flag = ["__pycache__", "DS_Store", "ipynb_checkpoints"]
     cprint(
@@ -44,14 +47,14 @@ def walk_and_process(dir_path, start_date=None, verbose=False) -> None:
         files_to_process = files_after_date(dir_path, start_date)
     else:
         files_to_process = [
-            os.path.join(root, f)
+            str(Path(root, f))
             for root, _, files in os.walk(dir_path)
             for f in files
-            if not any(x in os.path.join(root, f) for x in paths_to_flag)
+            if not any(x in str(Path(root, f)) for x in paths_to_flag)
         ]
 
     for file_path in files_to_process:
-        if os.path.exists(file_path):
+        if Path(file_path).exists():
             if file_path.endswith(".ipynb") or file_path.endswith(".py"):
                 if file_path.endswith(".ipynb"):
                     analyze_notebook(file_path, verbose)
@@ -59,7 +62,7 @@ def walk_and_process(dir_path, start_date=None, verbose=False) -> None:
                     analyze_python_file(file_path, verbose)
 
 
-def analyze_notebook(file_path, verbose) -> None:
+def analyze_notebook(file_path: str, verbose: bool) -> None:
     """Analyze a notebook"""
     num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(file_path)
 
@@ -86,7 +89,7 @@ def analyze_notebook(file_path, verbose) -> None:
         print("-" * 80)
 
 
-def analyze_python_file(file_path, verbose) -> None:
+def analyze_python_file(file_path: str, verbose: bool) -> None:
     """Analyze a Python file"""
     contains_subprocess = code_contains_subprocess(file_path)
     code_in_functions = is_code_in_functions_or_main(file_path)
@@ -106,8 +109,9 @@ def analyze_python_file(file_path, verbose) -> None:
         print("-" * 80)
 
 
-def print_results(tool_name, results, verbose=False) -> None:
+def print_results(tool_name: str, results: list, verbose: bool = False) -> None:
     """Print results from pylint or pyflake"""
+    max_displayed = 5
     if results:
         if verbose:
             print(f"\t{tool_name} found {len(results)} issues:")
@@ -115,24 +119,24 @@ def print_results(tool_name, results, verbose=False) -> None:
                 print(f"\t  {result}")
         else:
             print(f"\t{tool_name} found {len(results)} issues:")
-            for result in results[:5]:
+            for result in results[:max_displayed]:
                 print(f"\t  {result}")
-            if len(results) > 5:
+            if len(results) > max_displayed:
                 print(
-                    f"\t  ...plus {len(results) - 5} more. To see more details, use the --verbose flag."
+                    f"\t  ...plus {len(results) - max_displayed} more. To see more details, use the --verbose flag."
                 )
 
 
 def evaluate_repo(
-    path_or_url,
-    start_date=None,
-    verbose=False,
-    branchinfo=False,
-    branch_name="main",
+    path_or_url: str,
+    start_date: str = None,
+    verbose: bool = False,
+    branchinfo: bool = False,
+    branch_name: str = "main",
 ) -> None:
-    """This is the entry point to running the automated code review."""
+    """Runs the repo evaluation."""
     cprint(PREAMBLE_TEXT, color="green")
-    if os.path.isdir(path_or_url):
+    if Path(path_or_url).is_dir():
         if not is_git_repo(path_or_url):
             print(f"Error: {path_or_url} is not a Git repository.")
             exit(1)
@@ -165,7 +169,8 @@ def evaluate_repo(
     return 0
 
 
-def main():
+def main() -> None:
+    """Main entry point for running the command line interface."""
     parser = argparse.ArgumentParser(description="COCOA CLI")
 
     parser.add_argument("repo", help="Path to a repository root directory")

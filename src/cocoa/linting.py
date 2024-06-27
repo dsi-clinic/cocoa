@@ -44,7 +44,10 @@ def process_ruff_results(results: list) -> list:
 def reformat_with_ruff(path: str) -> None:
     """Reformats a directory with Ruff"""
     cprint("Reformatting with Ruff", color="green")
-    subprocess.run(["ruff", "format", path], capture_output=False)
+    try:
+        subprocess.run(["ruff", "format", path], capture_output=False)  # noqa
+    except Exception as e:
+        print("An unexpected error occurred while reformatting with Ruff:", e)
 
 
 def is_code_in_functions_or_main(file_path: str) -> bool:
@@ -95,7 +98,7 @@ def is_code_in_functions_or_main(file_path: str) -> bool:
 
 
 class SubprocessVisitor(ast.NodeVisitor):
-    """ "A visitor that looks for imports of subprocess."""
+    """Ast node visitor."""
 
     def __init__(self) -> None:
         """Create a new SubprocessVisitor"""
