@@ -1,26 +1,24 @@
 """Utilities for evaluating the status and structure of a git repository"""
 
-import os
 import tempfile
 from datetime import datetime
+from pathlib import Path
 
 import git
 import requests
 from git import GitCommandError, Repo
 
 
-def is_git_repo(repo_path):
+def is_git_repo(repo_path: str) -> bool:
     """Return a boolean if the directory supplied is a git repo."""
     try:
         return git.Repo(repo_path).git_dir is not None
     except git.InvalidGitRepositoryError:
-        raise Exception(f"Not a valid git repo: {repo_path}")
+        raise Exception(f"Not a valid git repo: {repo_path}")  # noqa: B904
 
 
-def get_remote_branches_info(repo_path, display=True):
-    """This function returns the branch information from the
-    remote repository.
-    """
+def get_remote_branches_info(repo_path: str, display: bool = True) -> list:
+    """Returns the branch information from the remote repository."""
     repo = git.Repo(repo_path)
     remote_branches = repo.remote().refs
 
@@ -47,7 +45,7 @@ def get_remote_branches_info(repo_path, display=True):
     return branch_info
 
 
-def get_current_branch(repo_path):
+def get_current_branch(repo_path: str) -> str:
     """Get the name of the current branch in a Git repository.
 
     Parameters:
@@ -76,9 +74,8 @@ def get_current_branch(repo_path):
     return None
 
 
-def clone_repo(repo_url, dir_name=None):
-    """Clones a Git repository into a specified directory or a temporary directory if
-    no directory is specified.
+def clone_repo(repo_url: str, dir_name: str = None) -> str:
+    """Clones a Git repository into a directory or a temporary directory.
 
     Parameters:
     - repo_url (str): The URL of the repository to be cloned. This must not be empty.
@@ -95,18 +92,19 @@ def clone_repo(repo_url, dir_name=None):
         # determine the directory path
         if dir_name:
             dir_path = dir_name
-            if not os.path.exists(dir_path):
-                os.makedirs(dir_path)
+            if not Path(dir_path).exists():
+                Path(dir_path).mkdir(parents=True)
             print(f"Using specified directory {dir_path} for cloning.")
         else:
             dir_path = tempfile.mkdtemp()
             print(f"Using temporary directory {dir_path} for cloning.")
 
         print(f"Cloning {repo_url} into {dir_path}")
-        repo_path = os.path.join(dir_path, repo_url.split("/")[-1])
+        # repo_path = os.path.join(dir_path, repo_url.split("/")[-1])
+        repo_path = str(Path(dir_path, repo_url.split("/")[-1]))
 
         # update but not clone if the dir existed
-        if os.path.exists(repo_path):
+        if Path(repo_path).exists():
             print(f"The directory {repo_path} already exists. Fetching changes.")
             repo = Repo(repo_path)
             repo.remote().fetch()
@@ -126,7 +124,7 @@ def clone_repo(repo_url, dir_name=None):
         raise
 
 
-def check_branch_names(repo_path):
+def check_branch_names(repo_path: str) -> list[str]:
     """Check for branches other than 'main' and 'dev' in the repository.
 
     Args:
@@ -152,9 +150,8 @@ def check_branch_names(repo_path):
     return warnings
 
 
-def files_after_date(repo_path, start_date):
-    """Returns a list of files that have been committed after
-    a specified start date.
+def files_after_date(repo_path: str, start_date: str) -> list[str]:
+    """Returns a list of files that have been committed after a specified start date.
 
     Args:
         repo_path (str): Path to the Git repository.
@@ -171,19 +168,20 @@ def files_after_date(repo_path, start_date):
         commit_date = datetime.fromtimestamp(commit.committed_date)
         if commit_date > since_date:
             for entry in commit.stats.files.keys():
-                file_path = os.path.join(repo.working_dir, entry)
+                file_path = str(Path(repo.working_dir, entry))
                 if file_path not in files_modified:
                     files_modified.append(file_path)
     return files_modified
 
 
-def is_git_remote_repo(url):
+def is_git_remote_repo(url: str) -> bool:
+    """Check if a url is a git remote"""
     # Normalize the URL by ensuring it ends with '.git'
     if not url.endswith(".git"):
         url += ".git"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         if response.ok:
             return True
     except requests.RequestException as e:
@@ -192,7 +190,7 @@ def is_git_remote_repo(url):
     return False
 
 
-def switch_branches(repo_path, target_branch):
+def switch_branches(repo_path: str, target_branch: str) -> None:
     """Switch branches in a repository"""
     repo = git.Repo(repo_path)
     # Fetch all branches from remote
