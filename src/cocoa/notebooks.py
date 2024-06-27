@@ -3,15 +3,17 @@
 import json
 
 
-def count_functions(cell):
+def count_functions(cell: dict) -> int:
     """Count the number of functions defined in a Jupyter Notebook cell."""
     code = cell["source"]
     return len([1 for line in code if line.strip().startswith("def ")])
 
 
-def process_notebook(file_path):
-    """Process a Jupyter Notebook and count the cells, lines of code
-    and functions.
+def process_notebook(file_path: str) -> tuple[int, int, int, int]:
+    """Process a Jupyter Notebook and count the cells, lines of code and functions.
+
+    Args:
+        file_path: path to the file to be processed
     """
     with open(file_path, encoding="utf-8") as f_handle:
         notebook = json.load(f_handle)
