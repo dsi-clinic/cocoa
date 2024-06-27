@@ -34,7 +34,7 @@ def find_first_match_index(lst: list, pattern: str) -> int:
 def process_ruff_results(results: list) -> list:
     """Process ruff results into a list of errors."""
     results = results.split("\n")
-    fmi = find_first_match_index(results, r"Found \d+ errors")  # noqa: Q000
+    fmi = find_first_match_index(results, r"Found \d+ error")  # noqa: Q000
 
     if fmi == -1:
         return []

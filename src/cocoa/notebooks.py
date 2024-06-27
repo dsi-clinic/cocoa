@@ -1,6 +1,7 @@
 """Utilities for evaluating the status and structure of Jupyter Notebooks"""
 
 import json
+from pathlib import Path
 
 
 def count_functions(cell: dict) -> int:
@@ -15,7 +16,7 @@ def process_notebook(file_path: str) -> tuple[int, int, int, int]:
     Args:
         file_path: path to the file to be processed
     """
-    with open(file_path, encoding="utf-8") as f_handle:
+    with Path(file_path).open(encoding="utf-8") as f_handle:
         notebook = json.load(f_handle)
         cells = notebook["cells"]
         num_cells = len(cells)
