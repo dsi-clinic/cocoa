@@ -5,8 +5,6 @@ import re
 import subprocess
 from pathlib import Path
 
-from termcolor import cprint
-
 
 def run_ruff_and_capture_output(path: str) -> str:
     """Runs ruff as subprocess and return output as a string."""
@@ -39,15 +37,6 @@ def process_ruff_results(results: list) -> list:
     if fmi == -1:
         return []
     return results[:fmi]
-
-
-def reformat_with_ruff(path: str) -> None:
-    """Reformats a directory with Ruff"""
-    cprint("Reformatting with Ruff", color="green")
-    try:
-        subprocess.run(["ruff", "format", path], capture_output=False)  # noqa
-    except Exception as e:
-        print("An unexpected error occurred while reformatting with Ruff:", e)
 
 
 def is_code_in_functions_or_main(file_path: str) -> bool:
