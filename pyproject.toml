@@ -25,7 +25,8 @@ dependencies = [
     "nbconvert",
     "ipython",
     "termcolor",
-    "requests" 
+    "requests",
+    "ruff"
 ]
 
 [project.scripts]
