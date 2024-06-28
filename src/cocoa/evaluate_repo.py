@@ -17,7 +17,6 @@ from cocoa.linting import (
     code_contains_subprocess,
     is_code_in_functions_or_main,
     process_ruff_results,
-    reformat_with_ruff,
     run_ruff_and_capture_output,
 )
 from cocoa.notebooks import process_notebook
@@ -152,8 +151,6 @@ def evaluate_repo(
             start_date=start_date,
             verbose=verbose,
         )
-
-        reformat_with_ruff(path_or_url)
 
     elif is_git_remote_repo(path_or_url):
         repo_path = clone_repo(path_or_url)

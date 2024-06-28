@@ -22,13 +22,11 @@ classifiers = [
 ]
 dependencies = [
     "GitPython",
-    "pyflakes",
-    "pylint",
     "nbconvert",
     "ipython",
     "termcolor",
-    "black",
-    "requests" 
+    "requests",
+    "ruff"
 ]
 
 [project.scripts]
