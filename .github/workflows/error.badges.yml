@@ -23,13 +23,13 @@ jobs:
       with:
         python-version: '3.10'  
 
-    - name: Install cocoa
-      run: pip3 install dsi-cocoa  
+    - name: Install cocoa and ruff
+      run: pip3 install dsi-cocoa ruff==0.4.10
 
     - name: Run cocoa and check output
       id: cocoa_run
       run: |
-        run_string="cocoa . --lint --verbose "
+        run_string="cocoa . --verbose "
 
         if [ ! -z "${{ vars.REVIEW_AFTER_DATE }}" ]; then
             echo "Running cocoa from date: ${{ vars.REVIEW_AFTER_DATE }}"
