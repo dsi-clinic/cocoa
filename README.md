@@ -6,15 +6,13 @@
 
 This repository was developed in order to generate automated reports on how well codebases adhere to the [coding standards](https://github.com/dsi-clinic/coding-standards) of the University of Chicago's DSI [Clinic course](https://datascience.uchicago.edu/education/data-science-clinic/).
 
-The goals of this codebase is to provide a quick and easy way to review code and to alert contributors where their code may be failing.
+The goal of this codebase is to provide a quick and easy way to review code and to alert contributors where their code may be failing.
 
 ## Installation
+This package depends on `ruff` being available in your environment.
 
-`pip install dsi-cocoa`
-
-To install the package locally, run the following command from the root of the repository:
 ```bash
-python3 -m pip install .
+python3 -m pip install dsi-cocoa ruff==0.4.10
 ```
 
 ## cocoa
@@ -34,26 +32,6 @@ Via command line:
 cocoa /path/to/repo
 ```
 
-As a python script:
-
-```bash
-python3 src/cocoa/evaluate_repo.py /path/to/repo
-```
-
-As a Python module:
-
-```python
-from cocoa.evaluate_repo import evaluate_repo
-
-evaluate_repo('/path/to/repo', False)
-```
-
-A few important notes:
-
-1. Make sure to `git pull` _before_ running this code.
-1. This will get branch information for all branches.
-1. This will only run the analysis (`pyflakes` on python files) for the code _in the current branch_. So if you run this while your current branch is `main` it will run on `main`.
-
 #### Options
 
 Results are truncated by default. To print all results, use the verbose option:
@@ -69,18 +47,16 @@ cocoa /path/to/repo --branch branch-name
 ```
 
 
-If files modified/created only after a certain date are to be evaluated then use the date option:
+To evaluate files created or modified after a certain date, use the date option:
 
 ```bash
 cocoa /path/to/repo --date YYYY-MM-DD
 ```
 
-Note: Please add date string in YYYY-MM-DD format.
-
 All options can be combined like so:
 
 ```bash
-cocoa /path/to/repo --lint --verbose --date YYYY-MM-DD
+cocoa /path/to/repo --verbose --branch <branch-name> --date YYYY-MM-DD
 ```
 
 
