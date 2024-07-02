@@ -5,7 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 
-from constants import RUFF_IGNORE, RUFF_SELECT
+from cocoa.constants import RUFF_IGNORE, RUFF_SELECT
 
 
 def run_ruff_and_capture_output(path: str) -> str:
