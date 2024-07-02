@@ -5,12 +5,26 @@ import re
 import subprocess
 from pathlib import Path
 
+from constants import RUFF_IGNORE, RUFF_SELECT
+
 
 def run_ruff_and_capture_output(path: str) -> str:
     """Runs ruff as subprocess and return output as a string."""
     try:
         # Run the ruff command
-        result = subprocess.run(["ruff", "check", path], capture_output=True, text=True)  # noqa
+        result = subprocess.run(
+            [  # noqa: S603, S607
+                "ruff",
+                "check",
+                path,
+                "--extend-select",
+                RUFF_SELECT,
+                "--ignore",
+                RUFF_IGNORE,
+            ],
+            capture_output=True,
+            text=True,
+        )
 
         # Combine stdout and stderr
         output = result.stdout + result.stderr
@@ -32,7 +46,7 @@ def find_first_match_index(lst: list, pattern: str) -> int:
 def process_ruff_results(results: list) -> list:
     """Process ruff results into a list of errors."""
     results = results.split("\n")
-    fmi = find_first_match_index(results, r"Found \d+ error")  # noqa: Q000
+    fmi = find_first_match_index(results, r"Found \d+ error")
 
     if fmi == -1:
         return []

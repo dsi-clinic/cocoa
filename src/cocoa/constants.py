@@ -8,3 +8,5 @@ PREAMBLE_TEXT = (
     "rubrics/final-technical-cleanup.md for more information "
     "on the criteria used here."
 )
+RUFF_SELECT = "ANN,B,C4,D,I,N801,N804,N805,PD,PLR2004,PTH,W,S,UP,YTT"
+RUFF_IGNORE = "D415,ANN002,ANN003,ANN101,ANN102,B905"
