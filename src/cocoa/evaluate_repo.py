@@ -7,7 +7,7 @@ from pathlib import Path
 
 from termcolor import cprint
 
-from cocoa.config import load_config
+from cocoa.config import DEFAULT_CONFIG, load_config
 from cocoa.constants import PREAMBLE_TEXT
 from cocoa.linting import (
     code_contains_subprocess,
@@ -28,9 +28,7 @@ from cocoa.repo import (
 )
 
 
-def walk_and_process(
-    dir_path: str, config: dict, start_date: str = None, verbose: bool = False
-) -> None:
+def walk_and_process(dir_path: str, config: dict, verbose: bool = False) -> None:
     """Walk through directory and process all python and jupyter notebook files."""
     paths_to_flag = ["__pycache__", "DS_Store", "ipynb_checkpoints"]
     cprint(
@@ -38,8 +36,8 @@ def walk_and_process(
         color="green",
     )
 
-    if start_date:
-        files_to_process = files_after_date(dir_path, start_date)
+    if config["start_date"]:
+        files_to_process = files_after_date(dir_path, config["start_date"])
     else:
         files_to_process = [
             str(Path(root, f))
@@ -128,10 +126,7 @@ def print_results(tool_name: str, results: list, verbose: bool = False) -> None:
 
 def evaluate_repo(
     path_or_url: str,
-    start_date: str = None,
-    verbose: bool = False,
-    branchinfo: bool = False,
-    branch_name: str = "main",
+    config: dict,
 ) -> None:
     """Runs the repo evaluation."""
     cprint(PREAMBLE_TEXT, color="green")
@@ -142,17 +137,15 @@ def evaluate_repo(
 
         repo_path_obj = Path(path_or_url)
         config = load_config(repo_path_obj)
-        switch_branches(path_or_url, branch_name)
+        switch_branches(path_or_url, config["branch_name"])
 
         check_branch_names(repo_path_obj)
-        if branchinfo:
+        if config["branchinfo"]:
             get_remote_branches_info(repo_path_obj)
 
         walk_and_process(
             repo_path_obj,
             config=config,
-            start_date=start_date,
-            verbose=verbose,
         )
 
     elif is_git_remote_repo(path_or_url):
@@ -161,10 +154,7 @@ def evaluate_repo(
         config = load_config(repo_path_obj)
         evaluate_repo(
             repo_path,
-            start_date=start_date,
-            verbose=verbose,
-            branchinfo=branchinfo,
-            branch_name=branch_name,
+            config=config,
         )
         shutil.rmtree(repo_path)
     else:
@@ -178,31 +168,27 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="COCOA CLI")
 
     parser.add_argument("repo", help="Path to a repository root directory")
-    parser.add_argument("--verbose", help="Print all results", action="store_true")
-    parser.add_argument(
-        "--date",
-        default=None,
-        help="Start date in YYYY-MM-DD format to filter files by commit date",
-        type=str,
-    )
-    parser.add_argument(
-        "--branchinfo", help="Report branch information", action="store_true"
-    )
-    parser.add_argument(
-        "--branch",
-        default="main",
-        help="Specify which branch to evaluate",
-        type=str,
-    )
+
+    # arguments added to parser based on DEFAULT_CONFIG in config.py
+    for setting_name, setting_info in DEFAULT_CONFIG.items():
+        # remove defaults. Since CLI overrides pyproject.toml, which overrides defaults,
+        # we don't want to set defaults here.
+        setting_info_no_default = {
+            k: v for k, v in setting_info.items() if k != "default"
+        }
+        parser.add_argument(
+            f"--{setting_name.replace('_', '-')}",
+            **setting_info_no_default,
+        )
     args = parser.parse_args()
+    config = load_config(args.repo)
+    for arg_name, arg_value in vars(args).items():
+        if arg_value is not None:
+            config[arg_name.replace("-", "_")] = arg_value
 
     dir_path = args.repo
-    start_date = args.date
-    verbose = args.verbose
-    branchinfo = args.branchinfo
-    branch = args.branch
-
-    evaluate_repo(dir_path, start_date, verbose, branchinfo, branch)
+    print(config)
+    evaluate_repo(dir_path, config)
 
 
 if __name__ == "__main__":
