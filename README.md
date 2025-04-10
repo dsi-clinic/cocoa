@@ -32,7 +32,40 @@ Via command line:
 cocoa /path/to/repo
 ```
 
-#### Options
+#### Configuration
+
+Cocoa can be configured via command-line arguments or through a `pyproject.toml` file in the root of the repository being analyzed. Command-line arguments always override settings in `pyproject.toml`.
+
+**Command-Line Options:**
+
+- `repo`: (Required) Path to the repository directory or a Git URL.
+- `--verbose`: Print all linting results instead of truncating (default: `False`).
+- `--branch <branch-name>`: Specify the branch to evaluate (default: `main`).
+- `--branchinfo`: Report detailed information about remote branches (default: `False`).
+- `--date <YYYY-MM-DD>`: Only analyze files committed on or after this date (defualt: `None`).
+- `--max-cells-per-notebook`: Maximum number of cells allowed in a Jupyter Notebook (default: `10`).
+- `--max-lines-per-cell`: Maximum number of lines allowed in a Jupyter Notebook Cell (default: `15`).
+- `--max-functions-per-notebook`: Maximum number of function definitions per notebook (default: `0`).
+
+**`pyproject.toml` Options:**
+
+Create a `[tool.cocoa]` section in your `pyproject.toml` file. Each option for the command line is an option in the pyproject.toml. Example file:
+
+```toml
+[tool.cocoa]
+# General settings
+verbose = false
+date = "YYYY-MM-DD"  # Optional: same as --date
+branchinfo = false
+branch = "main"
+
+# Notebook specific limits
+max-cells-per-notebook = 10
+max-lines-per-cell = 15
+max-functions-per-notebook = 0
+```
+
+**Example Usage:**
 
 Results are truncated by default. To print all results, use the verbose option:
 
