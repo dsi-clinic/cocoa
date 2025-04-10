@@ -7,12 +7,8 @@ from pathlib import Path
 
 from termcolor import cprint
 
-from cocoa.constants import (
-    MAX_CELLS_PER_NOTEBOOK,
-    MAX_FUNCTIONS_PER_NOTEBOOK,
-    MAX_LINES_PER_CELL,
-    PREAMBLE_TEXT,
-)
+from cocoa.config import load_config
+from cocoa.constants import PREAMBLE_TEXT
 from cocoa.linting import (
     code_contains_subprocess,
     is_code_in_functions_or_main,
@@ -33,7 +29,7 @@ from cocoa.repo import (
 
 
 def walk_and_process(
-    dir_path: str, start_date: str = None, verbose: bool = False
+    dir_path: str, config: dict, start_date: str = None, verbose: bool = False
 ) -> None:
     """Walk through directory and process all python and jupyter notebook files."""
     paths_to_flag = ["__pycache__", "DS_Store", "ipynb_checkpoints"]
@@ -56,43 +52,47 @@ def walk_and_process(
         if Path(file_path).exists():
             if file_path.endswith(".ipynb") or file_path.endswith(".py"):
                 if file_path.endswith(".ipynb"):
-                    analyze_notebook(file_path, verbose)
+                    analyze_notebook(file_path, config, verbose)
                 elif file_path.endswith(".py"):
-                    analyze_python_file(file_path, verbose)
+                    analyze_python_file(file_path, config, verbose)
 
 
-def analyze_notebook(file_path: str, verbose: bool) -> None:
+def analyze_notebook(file_path: str, config: dict, verbose: bool) -> None:
     """Analyze a notebook"""
     num_cells, num_lines, num_functions, max_lines_in_cell = process_notebook(file_path)
 
-    ruff_results = run_ruff_and_capture_output(file_path)
+    ruff_results = run_ruff_and_capture_output(
+        file_path, config["ruff_select"], config["ruff_ignore"]
+    )
     ruff_results = process_ruff_results(ruff_results)
 
     if (
         len(ruff_results) > 0
-        or num_cells > MAX_CELLS_PER_NOTEBOOK
-        or max_lines_in_cell > MAX_LINES_PER_CELL
-        or num_functions > MAX_FUNCTIONS_PER_NOTEBOOK
+        or num_cells > config["max_cells_per_notebook"]
+        or max_lines_in_cell > config["max_lines_per_cell"]
+        or num_functions > config["max_functions_per_notebook"]
     ):
         print(f"Analyzing {file_path}:")
         if len(ruff_results) > 0:
             print_results("ruff", ruff_results, verbose=verbose)
 
-        if num_cells > MAX_CELLS_PER_NOTEBOOK:
+        if num_cells > config["max_cells_per_notebook"]:
             print(f"\tMax number of cells exceeded: {num_cells}")
-        if max_lines_in_cell > MAX_LINES_PER_CELL:
+        if max_lines_in_cell > config["max_lines_per_cell"]:
             print(f"\tMax number of lines per cell exceeded: {max_lines_in_cell}")
-        if num_functions > MAX_FUNCTIONS_PER_NOTEBOOK:
+        if num_functions > config["max_functions_per_notebook"]:
             print(f"\tFunction definitions detected: {num_functions}")
 
         print("-" * 80)
 
 
-def analyze_python_file(file_path: str, verbose: bool) -> None:
+def analyze_python_file(file_path: str, config: dict, verbose: bool) -> None:
     """Analyze a Python file"""
     contains_subprocess = code_contains_subprocess(file_path)
     code_in_functions = is_code_in_functions_or_main(file_path)
-    ruff_results = run_ruff_and_capture_output(file_path)
+    ruff_results = run_ruff_and_capture_output(
+        file_path, config["ruff_select"], config["ruff_ignore"]
+    )
     ruff_results = process_ruff_results(ruff_results)
 
     if contains_subprocess or len(ruff_results) > 0 or not code_in_functions:
@@ -140,24 +140,31 @@ def evaluate_repo(
             print(f"Error: {path_or_url} is not a Git repository.")
             exit(1)
 
+        repo_path_obj = Path(path_or_url)
+        config = load_config(repo_path_obj)
         switch_branches(path_or_url, branch_name)
 
-        check_branch_names(path_or_url)
+        check_branch_names(repo_path_obj)
         if branchinfo:
-            get_remote_branches_info(path_or_url)
+            get_remote_branches_info(repo_path_obj)
 
         walk_and_process(
-            path_or_url,
+            repo_path_obj,
+            config=config,
             start_date=start_date,
             verbose=verbose,
         )
 
     elif is_git_remote_repo(path_or_url):
         repo_path = clone_repo(path_or_url)
+        repo_path_obj = Path(repo_path)
+        config = load_config(repo_path_obj)
         evaluate_repo(
             repo_path,
             start_date=start_date,
             verbose=verbose,
+            branchinfo=branchinfo,
+            branch_name=branch_name,
         )
         shutil.rmtree(repo_path)
     else:

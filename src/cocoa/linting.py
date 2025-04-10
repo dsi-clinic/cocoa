@@ -5,10 +5,8 @@ import re
 import subprocess
 from pathlib import Path
 
-from cocoa.constants import RUFF_IGNORE, RUFF_SELECT
 
-
-def run_ruff_and_capture_output(path: str) -> str:
+def run_ruff_and_capture_output(path: str, ruff_select: str, ruff_ignore: str) -> str:
     """Runs ruff as subprocess and return output as a string."""
     try:
         # Run the ruff command
@@ -18,9 +16,9 @@ def run_ruff_and_capture_output(path: str) -> str:
                 "check",
                 path,
                 "--extend-select",
-                RUFF_SELECT,
+                ruff_select,
                 "--ignore",
-                RUFF_IGNORE,
+                ruff_ignore,
             ],
             capture_output=True,
             text=True,
